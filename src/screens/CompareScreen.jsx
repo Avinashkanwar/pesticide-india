@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import DesktopSidebar from '../components/DesktopSidebar';
+import MobileBottomNav from '../components/MobileBottomNav';
+import TopNav from '../components/TopNav';
 import { Scale } from 'lucide-react';
 
 const DUMMY_PRODUCTS = [
@@ -19,8 +21,8 @@ const DUMMY_PRODUCTS = [
     id: 2,
     name: "Coragen Insecticide",
     brand: "FMC Corporation",
-    activeIngredient: "Chlorantraniliprole 18.5% SC",
-    targetCrops: "Cotton, Soybean, Rice",
+    activeIngredient: "Chlorantraniliprole 18.5% w/w SC",
+    targetCrops: "Cotton, Soybean, Rice, Sugarcane",
     targetPests: "Bollworm, Stem Borer, Leaf Folder",
     dosage: "60 ml / Acre",
     price: "₹890",
@@ -46,12 +48,13 @@ const CompareScreen = () => {
   const [product2, setProduct2] = useState(DUMMY_PRODUCTS[1]);
 
   return (
-    <div className="min-h-screen font-sans flex overflow-hidden" style={{background: '#FFFFFF'}}>
+    <div className="min-h-screen font-sans flex overflow-hidden" style={{background: 'transparent'}}>
       <DesktopSidebar />
       
-      <div className="flex-1 ml-24 flex flex-col min-w-0 h-screen overflow-y-auto pb-10">
+      <div className="flex-1 ml-0 md:ml-24 flex flex-col min-w-0 h-screen overflow-y-auto pb-20 md:pb-10">
+        <TopNav />
         {/* Header */}
-        <header className="pt-8 pb-6 px-8 max-w-[1600px] w-full mx-auto">
+        <header className="pt-8 pb-6 px-4 md:px-8 max-w-[1600px] w-full mx-auto">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center">
               <Scale size={24} className="text-[#00693B]" />
@@ -61,7 +64,7 @@ const CompareScreen = () => {
           <p className="text-[#333333] font-medium">Side-by-side technical comparison to help you choose the right solution.</p>
         </header>
 
-        <main className="max-w-[1600px] mx-auto px-8 w-full flex-1 flex flex-col">
+        <main className="max-w-[1600px] mx-auto px-4 md:px-8 w-full flex-1 flex flex-col">
           <div className="bg-white border border-gray-100 rounded-3xl shadow-sm overflow-hidden flex flex-col flex-1">
             
             {/* Selection Row */}
@@ -130,6 +133,7 @@ const CompareScreen = () => {
           </div>
         </main>
       </div>
+      <MobileBottomNav />
     </div>
   );
 };

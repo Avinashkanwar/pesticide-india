@@ -1,5 +1,6 @@
 import React from 'react';
 import DesktopSidebar from '../components/DesktopSidebar';
+import MobileBottomNav from '../components/MobileBottomNav';
 import TopNav from '../components/TopNav';
 import { ShoppingCart, Star, Plus } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
@@ -119,17 +120,17 @@ const DUMMY_PRODUCTS = [
 
 const ProductScreen = () => {
   return (
-    <div className="min-h-screen font-sans flex overflow-hidden" style={{background: '#FFFFFF'}}>
+    <div className="min-h-screen font-sans flex overflow-hidden" style={{background: 'transparent'}}>
       <DesktopSidebar />
       
-      <div className="flex-1 ml-32 flex flex-col min-w-0 h-screen overflow-y-auto pb-10">
+      <div className="flex-1 ml-0 md:ml-32 flex flex-col min-w-0 h-screen overflow-y-auto pb-20 md:pb-10">
         <TopNav />
-        <header className="pt-6 pb-6 px-8 max-w-[1600px] w-full mx-auto">
+        <header className="pt-6 pb-6 px-4 md:px-8 max-w-[1600px] w-full mx-auto">
           <h1 className="text-4xl font-extrabold text-[#00693B] tracking-tight mb-2">All Products</h1>
           <p className="text-[#333333] font-medium">Browse our full catalog of agricultural solutions and pesticides.</p>
         </header>
 
-        <main className="max-w-[1600px] mx-auto px-8 w-full flex-1">
+        <main className="max-w-[1600px] mx-auto px-4 md:px-8 w-full flex-1">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {DUMMY_PRODUCTS.map((product) => (
               <ProductCard key={product.id} product={product} />
@@ -137,6 +138,7 @@ const ProductScreen = () => {
           </div>
         </main>
       </div>
+      <MobileBottomNav />
     </div>
   );
 };

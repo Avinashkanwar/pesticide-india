@@ -1,6 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import DesktopSidebar from '../components/DesktopSidebar';
+import MobileBottomNav from '../components/MobileBottomNav';
+import TopNav from '../components/TopNav';
 import { BookOpen, ArrowRight } from 'lucide-react';
 
 const DUMMY_ARTICLES = [
@@ -46,12 +48,13 @@ const ArticleScreen = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen font-sans flex overflow-hidden" style={{background: '#FFFFFF'}}>
+    <div className="min-h-screen font-sans flex overflow-hidden" style={{background: 'transparent'}}>
       <DesktopSidebar />
       
-      <div className="flex-1 ml-24 flex flex-col min-w-0 h-screen overflow-y-auto pb-10">
+      <div className="flex-1 ml-0 md:ml-24 flex flex-col min-w-0 h-screen overflow-y-auto pb-20 md:pb-10">
+        <TopNav />
         {/* Header */}
-        <header className="pt-8 pb-6 px-8 max-w-[1600px] w-full mx-auto">
+        <header className="pt-8 pb-6 px-4 md:px-8 max-w-[1600px] w-full mx-auto">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center">
               <BookOpen size={24} className="text-[#00693B]" />
@@ -61,7 +64,7 @@ const ArticleScreen = () => {
           <p className="text-[#333333] font-medium">Expert articles on crop diseases, pest control, and farming best practices.</p>
         </header>
 
-        <main className="max-w-[1600px] mx-auto px-8 w-full flex-1 flex flex-col">
+        <main className="max-w-[1600px] mx-auto px-4 md:px-8 w-full flex-1 flex flex-col">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
             {DUMMY_ARTICLES.map((article) => (
               <div 
@@ -102,6 +105,7 @@ const ArticleScreen = () => {
           </div>
         </main>
       </div>
+      <MobileBottomNav />
     </div>
   );
 };

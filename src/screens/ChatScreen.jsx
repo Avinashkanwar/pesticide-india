@@ -1,5 +1,7 @@
 import React from 'react';
 import DesktopSidebar from '../components/DesktopSidebar';
+import MobileBottomNav from '../components/MobileBottomNav';
+import TopNav from '../components/TopNav';
 import { Send, Leaf, Image as ImageIcon, History, ChevronRight } from 'lucide-react';
 
 const DUMMY_HISTORY = [
@@ -25,11 +27,14 @@ const SUGGESTED_PRODUCTS = [
 
 const ChatScreen = () => {
   return (
-    <div className="h-screen font-sans flex overflow-hidden" style={{background: '#FFFFFF'}}>
-      <DesktopSidebar />
-      
-      {/* Main container avoiding sidebar */}
-      <div className="flex-1 flex min-w-0 h-screen ml-24 gap-4 p-4">
+    <div className="h-screen font-sans flex flex-col overflow-hidden" style={{background: 'transparent'}}>
+      <div className="flex flex-1 overflow-hidden">
+        <DesktopSidebar />
+        
+        {/* Main container avoiding sidebar */}
+        <div className="flex-1 flex flex-col min-w-0 h-full ml-0 md:ml-24">
+          <TopNav />
+          <div className="flex-1 flex gap-4 p-4 pb-20 md:pb-4 overflow-hidden">
         
         {/* Left Column: History */}
         <div className="w-72 bg-white rounded-3xl border border-gray-100 shadow-sm p-5 flex flex-col hidden lg:flex">
@@ -126,7 +131,10 @@ const ChatScreen = () => {
           </div>
         </div>
 
+          </div>
+        </div>
       </div>
+      <MobileBottomNav />
     </div>
   );
 };

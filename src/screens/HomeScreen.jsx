@@ -1,21 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DesktopSidebar from '../components/DesktopSidebar';
+import MobileBottomNav from '../components/MobileBottomNav';
 import { 
   Search, 
   Send,
   Camera,
   TrendingUp,
-  Zap,
   Droplets,
   Star,
   ArrowRight,
-  Bell,
   Sprout,
   AlertTriangle,
   Bug,
   FlaskConical,
-  Leaf
+  Leaf,
+  Sparkles,
+  ChevronRight
 } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
 
@@ -132,36 +133,39 @@ const products = [
   }
 ];
 
-const placeholderPhrases = [
-  "क्या आपकी फसल में कीड़े लग गए हैं?",
-  "क्या आपकी फसल की अच्छी से ग्रोथ नहीं हो रही?",
-  "फसल के पत्तों पर पीले धब्बे आ गए हैं?",
-  "E.g., Describe your crop issue here..."
-];
 
 const cropTips = [
-  { icon: <Droplets size={16}/>, tip: "Water crops early morning to reduce evaporation by up to 30%.", color: "blue" },
-  { icon: <Bug size={16}/>, tip: "Inspect leaf undersides weekly — early pest detection saves 80% of crop loss.", color: "red" },
-  { icon: <Sprout size={16}/>, tip: "Rotate crops each season to maintain soil health and reduce pest buildup.", color: "green" },
-  { icon: <FlaskConical size={16}/>, tip: "Always calibrate your sprayer before application for accurate dosing.", color: "purple" },
+  { icon: <Droplets size={16}/>, tip: "सुबह जल्दी पानी दें — वाष्पीकरण 30% तक कम होता है।", color: "blue" },
+  { icon: <Bug size={16}/>, tip: "हर हफ्ते पत्तों के नीचे जाँच करें — जल्दी पहचान से 80% फसल बच सकती है।", color: "red" },
+  { icon: <Sprout size={16}/>, tip: "हर मौसम में फसल बदलें — मिट्टी स्वस्थ रहती है और कीट कम होते हैं।", color: "green" },
+  { icon: <FlaskConical size={16}/>, tip: "स्प्रेयर को हमेशा कैलिब्रेट करें — सही मात्रा में दवा लगती है।", color: "purple" },
 ];
 
-
+const safetyTips = [
+  { icon: <AlertTriangle size={16}/>, tip: "रासायनिक उर्वरकों का उपयोग करते समय हमेशा दस्ताने और मास्क पहनें।" },
+  { icon: <FlaskConical size={16}/>, tip: "कीटनाशक स्प्रेयर को इस्तेमाल के बाद अच्छी तरह से धो लें।" },
+  { icon: <Sprout size={16}/>, tip: "यूरिया का छिड़काव तेज़ धूप में न करें, इससे पत्तियाँ जल सकती हैं।" },
+  { icon: <Bug size={16}/>, tip: "रसायनों को बच्चों और जानवरों की पहुँच से दूर रखें।" },
+];
 
 const alerts = [
-  { type: "warning", icon: <AlertTriangle size={14}/>, text: "High whitefly activity reported in Punjab & Haryana regions this week." },
-  { type: "info", icon: <Leaf size={14}/>, text: "New arrival: Bayer's Movento Energy now in stock — ideal for sucking pests." },
+  { type: "warning", icon: <AlertTriangle size={14}/>, text: "इस सप्ताह पंजाब और हरियाणा क्षेत्रों में सफेद मक्खी (सफेद कीट) का भारी प्रकोप देखा गया है।" },
+  { type: "info", icon: <Leaf size={14}/>, text: "नया स्टॉक: बायर का मोवेंटो एनर्जी अब उपलब्ध है — रस चूसने वाले कीटों के लिए सर्वोत्तम।" },
 ];
 
 const HomeScreen = () => {
   const navigate = useNavigate();
-  const [placeholderIndex, setPlaceholderIndex] = useState(0);
-  const [placeholderText, setPlaceholderText] = useState('');
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [aiCrop, setAiCrop] = useState('');
+  const [aiAge, setAiAge] = useState('');
+  const [aiDisease, setAiDisease] = useState('');
+  const [aiStatus, setAiStatus] = useState('idle');
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('All');
   const [activeTip, setActiveTip] = useState(0);
   const [alertIndex, setAlertIndex] = useState(0);
+  const [searchFocused, setSearchFocused] = useState(false);
+  const [headerTipIndex, setHeaderTipIndex] = useState(0);
+  const isLoggedIn = !!localStorage.getItem('token');
 
   const categories = ['All', 'Pesticides', 'Fertilizers', 'Sprayers', 'Nets'];
 
@@ -179,173 +183,184 @@ const HomeScreen = () => {
     return matchesSearch && matchesCategory;
   });
 
-  // Typing animation
-  useEffect(() => {
-    const currentPhrase = placeholderPhrases[placeholderIndex];
-    let typingSpeed = isDeleting ? 30 : 60;
-    if (!isDeleting && placeholderText === currentPhrase) {
-      const pauseTimer = setTimeout(() => setIsDeleting(true), 2500);
-      return () => clearTimeout(pauseTimer);
-    } else if (isDeleting && placeholderText === '') {
-      setIsDeleting(false);
-      setPlaceholderIndex((prev) => (prev + 1) % placeholderPhrases.length);
-      return;
-    }
-    const timer = setTimeout(() => {
-      setPlaceholderText((prev) => 
-        isDeleting 
-          ? currentPhrase.substring(0, prev.length - 1)
-          : currentPhrase.substring(0, prev.length + 1)
-      );
-    }, typingSpeed);
-    return () => clearTimeout(timer);
-  }, [placeholderText, isDeleting, placeholderIndex]);
 
-  // Auto-rotate tips
+
   useEffect(() => {
     const t = setInterval(() => setActiveTip(p => (p + 1) % cropTips.length), 4000);
     return () => clearInterval(t);
   }, []);
 
-  // Auto-rotate alerts
   useEffect(() => {
     const t = setInterval(() => setAlertIndex(p => (p + 1) % alerts.length), 5000);
     return () => clearInterval(t);
   }, []);
 
-  return (
-    <div className="min-h-screen font-sans flex overflow-hidden" style={{background: '#FFFFFF'}}>
+  useEffect(() => {
+    const t = setInterval(() => setHeaderTipIndex(p => (p + 1) % alerts.length), 4000);
+    return () => clearInterval(t);
+  }, []);
 
+  return (
+    <div className="min-h-screen flex bg-transparent font-outfit overflow-hidden">
       <DesktopSidebar />
 
-      {/* Main Content Area */}
-      <div className="flex-1 ml-24 flex flex-col min-w-0 h-screen overflow-y-auto">
+      <div className="flex-1 ml-0 md:ml-24 flex flex-col min-w-0 h-screen overflow-y-auto pb-16 md:pb-0">
 
-        {/* ── TOP HEADER BAR ── */}
-        <header className="pt-5 pb-4 px-8 max-w-[1700px] w-full mx-auto flex items-center justify-between">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-widest text-[#333333]/60 mb-0.5">Welcome back, Farmer 👋</p>
-            <h1 className="text-2xl font-extrabold gradient-text tracking-tight">PesticideIndia Dashboard</h1>
-          </div>
+        {/* ── HEADER ── */}
+        <header className="px-6 md:px-10 py-6 md:py-8 flex items-center justify-between gap-4 sticky top-0 z-50 bg-gray-100/70 backdrop-blur-xl">
           <div className="flex items-center gap-3">
-            {/* Alert ticker */}
-            <div className="hidden lg:flex items-center gap-2 bg-white/70 backdrop-blur border border-white/60 rounded-2xl px-4 py-2 shadow-sm max-w-xs overflow-hidden">
-              <span className={`w-2 h-2 rounded-full shrink-0 ${alertIndex === 0 ? 'bg-amber-400' : 'bg-[#FEB600]'} animate-pulse`}></span>
-              <p className="text-xs font-medium text-[#333333]/70 truncate">{alerts[alertIndex].text}</p>
+            <div className="w-10 h-10 bg-[#00693B] rounded-xl flex items-center justify-center text-white font-black text-lg shadow-md font-inter tracking-tighter">PI</div>
+            <div>
+              <h1 className="text-xl font-black text-[#111827] m-0 leading-[1.1] font-inter tracking-tight">
+                Pesticide<span className="text-[#00693B]">India</span>
+              </h1>
+              <p className="text-[11px] font-semibold text-gray-500 m-0 uppercase tracking-widest mt-[2px]">Smart Farming Solutions</p>
             </div>
-            <button className="relative w-10 h-10 rounded-xl bg-white/70 backdrop-blur border border-white/60 shadow-sm flex items-center justify-center hover:scale-105 transition-transform">
-              <Bell size={18} className="text-[#333333]"/>
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#EC5017] rounded-full border-2 border-white"></span>
-            </button>
-            <button 
-              onClick={() => { localStorage.removeItem('token'); navigate('/login'); }}
-              className="px-5 py-2 rounded-xl text-xs font-bold bg-transparent border border-[#EC5017] text-[#EC5017] hover:bg-[#EC5017] hover:text-white transition-colors"
+          </div>
+
+          {/* Desktop Ticker */}
+          <div className="hidden lg:flex items-center bg-[#fffbeb] border border-[#fde68a] px-3.5 py-1.5 rounded-full shadow-sm max-w-[480px] flex-1 overflow-hidden">
+            <span className={`w-2 h-2 rounded-full mr-2 shrink-0 animate-pulse ${alertIndex === 0 ? 'bg-amber-500' : 'bg-emerald-500'}`}></span>
+            <span
+              key={alertIndex}
+              className="text-[11px] font-bold text-amber-800 whitespace-nowrap overflow-hidden text-ellipsis m-0 font-outfit animate-[fadeInUp_0.5s_ease]"
             >
-              Logout
+              {alerts[alertIndex].text}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-4">
+            <button
+              id="about-btn"
+              onClick={() => navigate('/about')}
+              className="text-[13px] font-semibold text-gray-500 hover:text-[#00693B] transition-colors font-outfit cursor-pointer"
+            >
+              About
             </button>
+
+            {!isLoggedIn && (
+              <button
+                id="login-btn"
+                onClick={() => navigate('/login')}
+                className="px-5 py-1.5 bg-white border-[1.5px] border-[#00693B] rounded-lg text-[13px] font-bold text-[#00693B] hover:bg-[#00693B] hover:text-white transition-all font-outfit cursor-pointer"
+              >
+                Login
+              </button>
+            )}
+
+            {isLoggedIn && (
+              <button
+                id="logout-btn"
+                onClick={() => { localStorage.removeItem('token'); navigate('/login'); }}
+                className="px-4 py-1.5 bg-white border-[1.5px] border-red-300 rounded-lg text-[13px] font-semibold text-red-600 hover:bg-red-50 hover:border-red-500 transition-all font-outfit cursor-pointer"
+              >
+                Logout
+              </button>
+            )}
           </div>
         </header>
 
-        {/* ── HERO BANNER ── */}
-        <div className="px-8 max-w-[1700px] w-full mx-auto mb-3">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <div>
-              <p className="text-[10px] font-semibold text-[#333333] uppercase tracking-widest mb-0.5">Precision Farming AI</p>
-              <h2 className="text-base font-bold text-[#00693B] tracking-tight">
-                Smart Solutions for <span className="text-[#333333] font-semibold">Healthy Crops</span>
-              </h2>
-            </div>
-            <div className="flex items-center gap-2 shrink-0">
-              {[
-                { val: "10K+", label: "Products" },
-                { val: "4.8★", label: "Avg Rating" },
-                { val: "98%", label: "Accuracy" },
-              ].map((s, i) => (
-                <div key={i} className="flex flex-col items-center bg-white/50 rounded-lg px-3 py-1.5 border border-gray-100">
-                  <span className="text-xs font-bold text-[#333333]">{s.val}</span>
-                  <span className="text-[9px] text-[#333333] font-medium">{s.label}</span>
-                </div>
-              ))}
-            </div>
-          </div>
+        {/* Mobile Ticker */}
+        <div className="lg:hidden bg-[#fffbeb] border-b border-[#fde68a] px-4 py-2 flex items-center shadow-sm">
+          <span className={`w-2 h-2 rounded-full mr-2 shrink-0 animate-pulse ${alertIndex === 0 ? 'bg-amber-500' : 'bg-emerald-500'}`}></span>
+          <span
+            key={alertIndex + 'mobile'}
+            className="text-[11px] font-bold text-amber-800 whitespace-nowrap overflow-hidden text-ellipsis m-0 font-outfit animate-[fadeInUp_0.5s_ease]"
+          >
+            {alerts[alertIndex].text}
+          </span>
         </div>
 
 
+        {/* ── MAIN GRID ── */}
+        <main className="flex-1 px-4 md:px-7 pt-6 md:pt-8 flex flex-col lg:flex-row gap-6 items-start pb-6">
 
-        <main className="max-w-[1700px] mx-auto px-8 grid grid-cols-1 xl:grid-cols-12 gap-6 w-full flex-1 pb-10">
-          
-          {/* ── LEFT: PRODUCTS ── */}
-          <div className="flex flex-col gap-5 min-w-0 xl:col-span-8">
+          {/* LEFT: Products */}
+          <div className="flex-1 min-w-0 flex flex-col gap-5">
 
-            {/* Search Bar */}
-            <div className="flex flex-col gap-3">
-              <div className="relative w-full group">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <Search size={18} className="text-gray-400 transition-colors" />
-                </div>
-                <input 
-                  type="text" 
-                  placeholder="Search pesticides, sprayers, fertilizers..." 
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-11 pr-4 py-3.5 bg-white rounded-2xl border border-gray-200 text-sm text-[#333333] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#FEB600]/30 focus:border-[#FEB600] transition-all font-medium shadow-sm"
-                />
-              </div>
-
-              {/* Category Tabs */}
-              <div className="flex flex-wrap gap-2">
-                {categories.map((cat) => {
-                  const isActive = activeCategory === cat;
-                  return (
-                    <button
-                      key={cat}
-                      onClick={() => setActiveCategory(cat)}
-                      className={`px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 active:scale-95 border ${
-                        isActive 
-                          ? 'bg-[#FEB600] text-[#333333] border-[#FEB600] shadow-md shadow-[#FEB600]/20' 
-                          : 'bg-white text-[#333333] border-gray-200 hover:border-[#00693B]/40 hover:text-[#00693B]'
-                      }`}
-                    >
-                      {cat} <span className="text-[10px] ml-0.5 opacity-60">({getCount(cat)})</span>
-                    </button>
-                  );
-                })}
-              </div>
+            {/* Search */}
+            <div className={`flex items-center gap-2 glass-panel rounded-xl py-3 px-4 transition-colors duration-200 ${searchFocused ? 'border-[#00693B] ring-2 ring-[#00693B]/10' : 'border-[#00693B]/10'}`}>
+              <Search size={16} className={`shrink-0 transition-colors duration-200 ${searchFocused ? 'text-[#00693B]' : 'text-gray-400'}`} />
+              <input
+                id="product-search"
+                type="text"
+                placeholder="Search pesticides, sprayers, fertilizers..."
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                onFocus={() => setSearchFocused(true)}
+                onBlur={() => setSearchFocused(false)}
+                className="flex-1 border-none outline-none text-[13px] text-gray-900 font-medium bg-transparent font-outfit placeholder-gray-400"
+              />
+              {searchQuery && (
+                <button onClick={() => setSearchQuery('')} className="bg-transparent border-none text-gray-400 hover:text-gray-700 cursor-pointer p-0 font-bold text-xs">✕</button>
+              )}
             </div>
 
-            {/* Section Title */}
+            {/* Category Pills */}
+            <div className="flex gap-2.5 overflow-x-auto pb-1 scrollbar-hide">
+              {categories.map(cat => {
+                const isActive = activeCategory === cat;
+                return (
+                  <button
+                    key={cat}
+                    id={`cat-${cat.toLowerCase()}`}
+                    onClick={() => setActiveCategory(cat)}
+                    className={`flex items-center gap-1.5 py-[7px] px-3.5 rounded-[10px] text-[12px] font-bold border transition-all duration-200 whitespace-nowrap font-outfit cursor-pointer ${
+                      isActive 
+                        ? 'bg-[#00693B] text-white border-[#00693B]' 
+                        : 'bg-white text-gray-600 border-gray-200 hover:border-[#00693B] hover:text-[#00693B]'
+                    }`}
+                  >
+                    {cat}
+                    <span className={`text-[10px] font-extrabold py-0.5 px-1.5 rounded-full ${
+                      isActive ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-400'
+                    }`}>
+                      {getCount(cat)}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Section Header */}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="w-1 h-5 bg-[#FEB600] rounded-full"></div>
-                <h2 className="text-base font-extrabold text-[#00693B]">
+                <div className="w-[3px] h-4 bg-[#00693B] rounded-sm"></div>
+                <h2 className="text-[14px] font-bold text-gray-900 m-0 font-inter">
                   {activeCategory === 'All' ? 'All Products' : activeCategory}
                 </h2>
-                <span className="text-xs text-[#333333] font-medium">({filteredProducts.length} items)</span>
+                <span className="text-[11px] text-gray-400 font-medium">{filteredProducts.length} items</span>
               </div>
-              <button onClick={() => navigate('/products')} className="text-xs font-bold text-[#333333]/60 flex items-center gap-1 hover:gap-2 hover:text-[#333333] transition-all">
+              <button
+                id="view-all-btn"
+                onClick={() => navigate('/products')}
+                className="flex items-center gap-1 text-[12px] font-semibold text-gray-400 bg-transparent border-none cursor-pointer hover:text-[#00693B] transition-colors duration-150"
+              >
                 View All <ArrowRight size={13}/>
               </button>
             </div>
 
             {/* Product Grid */}
             {filteredProducts.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
                 {filteredProducts.map((product, i) => (
-                  <div key={product.id} className="animate-fade-in-up" style={{animationDelay: `${i * 60}ms`}}>
+                  <div
+                    key={product.id}
+                    className="animate-[fadeInUp_0.5s_ease]"
+                    style={{ animationDelay: `${i * 50}ms` }}
+                  >
                     <ProductCard product={product} isSmall={true} />
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="flex flex-col items-center justify-center py-20 text-center border border-dashed border-gray-200 rounded-[32px] bg-white/30 px-6">
-                <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mb-4">
-                  <Search size={28} className="text-[#333333]"/>
-                </div>
-                <p className="text-[#333333] font-bold text-sm mb-1">No products found</p>
-                <p className="text-[#333333] text-xs font-medium mb-4">Try adjusting your search or filters</p>
-                <button 
+              <div className="flex flex-col items-center justify-center py-12 px-4 glass-panel rounded-xl border-dashed gap-1">
+                <div className="text-[32px] mb-1">🔍</div>
+                <p className="text-[14px] font-bold text-gray-900 m-0">No products found</p>
+                <p className="text-[12px] text-gray-400 m-0">Try adjusting your search or category filter</p>
+                <button
                   onClick={() => { setSearchQuery(''); setActiveCategory('All'); }}
-                  className="px-5 py-2.5 bg-[#FEB600] text-white rounded-xl text-xs font-bold hover:bg-[#FEB600] transition-all shadow-sm active:scale-95"
+                  className="py-1.5 px-4 bg-[#00693B] text-white border-none rounded-lg text-[12px] font-semibold cursor-pointer mt-2"
                 >
                   Clear Filters
                 </button>
@@ -353,96 +368,149 @@ const HomeScreen = () => {
             )}
           </div>
 
-          {/* ── RIGHT COLUMN ── */}
-          <div className="min-w-0 xl:col-span-4 flex flex-col gap-5">
+          {/* RIGHT: Sidebar Panels */}
+          <div className="w-full lg:w-[300px] xl:w-[350px] flex flex-col gap-5 shrink-0 lg:sticky lg:top-32 lg:h-[calc(100vh-10rem)] lg:overflow-y-auto pb-8 custom-scrollbar">
 
-
-            {/* AI Crop Assistant Panel */}
-            <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
-              {/* Header */}
-              <div className="flex items-center justify-between mb-4">
+            {/* AI Crop Assistant */}
+            <div className="glass-panel rounded-xl p-4">
+              <div className="flex items-start justify-between">
                 <div>
-                  <h2 className="text-base font-extrabold text-[#00693B] tracking-tight">AI Crop Assistant</h2>
-                  <p className="text-xs text-[#333333]/60 font-medium mt-0.5">Powered by Precision Farming</p>
+                  <div className="flex items-center gap-1.5 mb-0.5">
+                    <Sparkles size={14} color="#FEB600" />
+                    <h2 className="text-[14px] font-extrabold text-gray-900 m-0 font-inter">AI Crop Assistant</h2>
+                  </div>
+                  <p className="text-[10px] text-gray-500 m-0 font-medium">Powered by Precision Farming</p>
                 </div>
-                <span className="flex items-center gap-1.5 text-[10px] font-bold text-[#333333]/70 bg-[#FEB600]/10 px-2.5 py-1 rounded-full border border-[#FEB600]/30">
-                  <span className="w-1.5 h-1.5 bg-[#FEB600] rounded-full animate-pulse"></span> Live
+                <span className="flex items-center gap-1 py-0.5 px-2 bg-green-50 border border-green-200 rounded-full text-[9px] font-bold text-green-600 uppercase tracking-wider">
+                  <span className="w-1 h-1 bg-green-600 rounded-full animate-pulse"></span> Live
                 </span>
               </div>
 
-              {/* Divider */}
-              <div className="h-px bg-gray-100 mb-4"></div>
+              <div className="h-[1px] bg-gray-100 my-3.5"></div>
 
-              {/* Description */}
-              <p className="text-xs text-[#333333]/70 mb-4 leading-relaxed">
-                अपनी फसल की समस्या बताएं या फोटो अपलोड करें और तुरंत सलाह पाएं।
-              </p>
+              {aiStatus === 'idle' && (
+                <div className="flex flex-col gap-3">
+                  <p className="text-[12px] text-gray-600 m-0 leading-snug">
+                    अपनी फसल, उसकी अवस्था और बीमारी चुनें, और तुरंत सटीक समाधान पाएं।
+                  </p>
+                  
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">फसल चुनें (Select Crop)</label>
+                    <select value={aiCrop} onChange={e => setAiCrop(e.target.value)} className="w-full py-2 px-3 bg-gray-50 border border-gray-200 rounded-lg text-[12px] text-gray-900 font-semibold outline-none transition-colors duration-200 appearance-none font-outfit focus:border-[#00693B]">
+                      <option value="">-- फसल चुनें --</option>
+                      <option value="गेहूँ (Wheat)">गेहूँ (Wheat)</option>
+                      <option value="धान (Rice)">धान (Rice)</option>
+                      <option value="कपास (Cotton)">कपास (Cotton)</option>
+                      <option value="गन्ना (Sugarcane)">गन्ना (Sugarcane)</option>
+                      <option value="टमाटर (Tomato)">टमाटर (Tomato)</option>
+                    </select>
+                  </div>
 
-              {/* Textarea */}
-              <div className="mb-3">
-                <label className="block text-[10px] font-bold text-[#333333]/60 mb-1.5 uppercase tracking-widest">
-                  Describe Your Problem
-                </label>
-                <div className="relative">
-                  <textarea 
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 pr-12 text-sm text-[#333333] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#FEB600]/40 focus:border-[#FEB600] transition-all resize-none"
-                    rows="3"
-                    placeholder={`${placeholderText}|`}
-                  ></textarea>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">फसल की अवस्था (Crop Stage)</label>
+                    <select value={aiAge} onChange={e => setAiAge(e.target.value)} className="w-full py-2 px-3 bg-gray-50 border border-gray-200 rounded-lg text-[12px] text-gray-900 font-semibold outline-none transition-colors duration-200 appearance-none font-outfit focus:border-[#00693B]">
+                      <option value="">-- अवस्था चुनें --</option>
+                      <option value="पौध (Seedling)">पौध (Seedling)</option>
+                      <option value="वानस्पतिक विकास (Vegetative)">वानस्पतिक विकास (Vegetative)</option>
+                      <option value="फूल आना (Flowering)">फूल आना (Flowering)</option>
+                      <option value="फल लगना (Fruiting)">फल लगना (Fruiting)</option>
+                      <option value="परिपक्व (Mature)">परिपक्व (Mature)</option>
+                    </select>
+                  </div>
+
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">बीमारी/समस्या (Observed Issue)</label>
+                    <select value={aiDisease} onChange={e => setAiDisease(e.target.value)} className="w-full py-2 px-3 bg-gray-50 border border-gray-200 rounded-lg text-[12px] text-gray-900 font-semibold outline-none transition-colors duration-200 appearance-none font-outfit focus:border-[#00693B]">
+                      <option value="">-- समस्या चुनें --</option>
+                      <option value="सफेद मक्खी (Whitefly)">सफेद मक्खी (Whitefly)</option>
+                      <option value="माहू (Aphids)">माहू (Aphids)</option>
+                      <option value="झुलसा रोग (Leaf Blight)">झुलसा रोग (Leaf Blight)</option>
+                      <option value="पत्तियों का पीला पड़ना">पत्तियों का पीला पड़ना (Yellowing)</option>
+                      <option value="फल छेदक कीट (Fruit Borer)">फल छेदक कीट (Fruit Borer)</option>
+                    </select>
+                  </div>
+
                   <button 
-                    onClick={() => navigate('/chat')}
-                    className="absolute bottom-2.5 right-2.5 w-7 h-7 flex items-center justify-center rounded-lg transition-all active:scale-95 bg-[#FEB600] hover:bg-[#e6a400]"
-                    title="Send to Chat"
+                    className={`w-full py-3 bg-[#FEB600] text-[#1a1a1a] border-none rounded-lg text-[12px] font-bold flex items-center justify-center gap-1.5 transition-all duration-200 mt-1 font-outfit ${
+                      (aiCrop && aiAge && aiDisease) ? 'opacity-100 cursor-pointer hover:bg-[#e6a400]' : 'opacity-50 cursor-not-allowed'
+                    }`}
+                    disabled={!(aiCrop && aiAge && aiDisease)}
+                    onClick={() => {
+                      setAiStatus('analyzing');
+                      setTimeout(() => {
+                        navigate('/chat', { state: { crop: aiCrop, age: aiAge, disease: aiDisease } });
+                      }, 2000);
+                    }}
                   >
-                    <Send size={13} className="text-[#333333]" />
+                    Analyze with AI <Sparkles size={14} color="#1a1a1a" />
                   </button>
                 </div>
-              </div>
+              )}
 
-              {/* Upload button */}
-              <button className="w-full py-2.5 px-4 bg-gray-50 border border-gray-200 rounded-xl text-xs font-semibold text-[#333333] flex items-center justify-center gap-2 hover:bg-gray-100 transition-all mb-3">
-                <Camera size={14} className="text-[#333333]/60" />
-                Upload Crop Photo
-              </button>
+              {aiStatus === 'analyzing' && (
+                <div className="flex flex-col items-center justify-center py-6 px-4 bg-gray-50 rounded-xl border border-gray-100 mt-2">
+                  <div className="w-6 h-6 border-2 border-[#FEB600] border-t-transparent rounded-full animate-spin mb-2.5"></div>
+                  <p className="text-[12px] font-bold text-gray-900 m-0 text-center">Analyzing {aiCrop} {aiDisease} data...</p>
+                  <p className="text-[10px] text-gray-500 m-0 mt-1 text-center font-medium">Cross-referencing with local conditions</p>
+                </div>
+              )}
 
-              {/* CTA */}
-              <button 
-                onClick={() => navigate('/chat')}
-                className="w-full py-2.5 px-4 rounded-xl text-xs font-extrabold text-[#333333] flex items-center justify-center gap-2 transition-all active:scale-95 hover:opacity-90 bg-[#FEB600]"
-              >
-                <Zap size={13}/> Analyze & Recommend
-              </button>
+
             </div>
 
-            {/* Crop Tips Carousel */}
-            <div className="glass-card rounded-[24px] p-5 shadow-sm">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <TrendingUp size={16} className="text-[#00693B]"/>
-                  <span className="text-sm font-extrabold text-[#00693B]">Farming Tip</span>
+            {/* ⚠️ उर्वरक और उपकरण सुरक्षा */}
+            <div className="glass-panel rounded-xl p-4">
+              <div className="flex items-center justify-between mb-3.5">
+                <div className="flex items-center gap-1.5">
+                  <div className="w-5 h-5 rounded-[6px] bg-red-500 flex items-center justify-center shrink-0">
+                    <AlertTriangle size={13} color="#fff" />
+                  </div>
+                  <span className="text-[13px] font-extrabold text-gray-900 m-0 font-inter">⚠️ उर्वरक और उपकरण सुरक्षा</span>
                 </div>
                 <div className="flex gap-1">
-                  {cropTips.map((_,i) => (
-                    <button key={i} onClick={() => setActiveTip(i)} className={`w-1.5 h-1.5 rounded-full transition-all ${i === activeTip ? 'bg-[#FEB600] w-4' : 'bg-gray-200'}`}></button>
+                  {safetyTips.map((_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setActiveTip(i)}
+                      className={`h-1.5 rounded-full transition-all duration-300 border-none cursor-pointer p-0 ${i === activeTip ? 'bg-[#00693B] w-4' : 'bg-gray-300 w-1.5'}`}
+                    />
                   ))}
                 </div>
               </div>
-              <div className="flex items-start gap-3">
-                <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
-                  activeTip === 0 ? 'bg-gray-50 text-[#333333]' :
-                  activeTip === 1 ? 'bg-red-50 text-red-500' :
-                  activeTip === 2 ? 'bg-gray-50 text-[#00693B]' :
-                  'bg-purple-50 text-purple-500'
+
+              <div className="flex items-start gap-2.5 p-2.5 bg-white/50 backdrop-blur-md rounded-xl border border-gray-200/50 shadow-sm">
+                <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${
+                  activeTip === 0 ? 'bg-blue-100 text-blue-600' :
+                  activeTip === 1 ? 'bg-red-100 text-red-600' :
+                  activeTip === 2 ? 'bg-green-100 text-green-600' : 'bg-purple-100 text-purple-600'
                 }`}>
-                  {cropTips[activeTip].icon}
+                  {safetyTips[activeTip].icon}
                 </div>
-                <p className="text-sm text-[#333333] font-medium leading-relaxed">{cropTips[activeTip].tip}</p>
+                <p className="text-[12px] font-semibold text-gray-700 m-0 leading-snug flex-1 pt-0.5 font-outfit">{safetyTips[activeTip].tip}</p>
+              </div>
+            </div>
+
+            {/* स्प्रे और उर्वरक अनुसूची — Spray & Fertilizer Schedule */}
+            <div className="bg-white/70 backdrop-blur-md rounded-xl p-4 border border-[#00693B]/10">
+              <p className="text-[13px] font-extrabold text-gray-900 m-0 mb-3 font-inter">📅 स्प्रे और उर्वरक अनुसूची</p>
+              <div className="flex flex-col gap-2">
+                {[
+                  { emoji: '⏱️', text: 'सुबह 7 से 10 बजे के बीच स्प्रे करना सबसे अच्छा है।' },
+                  { emoji: '💨', text: 'तेज़ हवा में कीटनाशक स्प्रे करने से बचें।' },
+                  { emoji: '🌱', text: 'उर्वरक मिट्टी में नमी होने पर ही डालें।' },
+                ].map((item, i) => (
+                  <div key={i} className="flex items-start gap-2 p-2 bg-white/50 backdrop-blur-sm rounded-lg border border-gray-100/50 shadow-sm">
+                    <span className="text-[14px]">{item.emoji}</span>
+                    <p className="text-[11px] font-semibold text-gray-700 m-0 leading-[1.3] flex-1 pt-0.5 font-outfit">{item.text}</p>
+                  </div>
+                ))}
               </div>
             </div>
 
           </div>
         </main>
       </div>
+      <MobileBottomNav />
     </div>
   );
 };

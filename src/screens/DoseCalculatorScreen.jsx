@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import DesktopSidebar from '../components/DesktopSidebar';
+import MobileBottomNav from '../components/MobileBottomNav';
+import TopNav from '../components/TopNav';
 import { Calculator, Droplets, FlaskConical, Beaker } from 'lucide-react';
 
 const DoseCalculatorScreen = () => {
@@ -14,12 +16,13 @@ const DoseCalculatorScreen = () => {
   const dosePerTank = dosePerLiter * tankSize;
 
   return (
-    <div className="min-h-screen font-sans flex overflow-hidden" style={{background: '#FFFFFF'}}>
+    <div className="min-h-screen font-sans flex overflow-hidden" style={{background: 'transparent'}}>
       <DesktopSidebar />
       
-      <div className="flex-1 ml-24 flex flex-col min-w-0 h-screen overflow-y-auto pb-10">
+      <div className="flex-1 ml-0 md:ml-24 flex flex-col min-w-0 h-screen overflow-y-auto pb-20 md:pb-10">
+        <TopNav />
         {/* Header */}
-        <header className="pt-8 pb-6 px-8 max-w-[1600px] w-full mx-auto">
+        <header className="pt-8 pb-6 px-4 md:px-8 max-w-[1600px] w-full mx-auto">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center">
               <Calculator size={24} className="text-[#00693B]" />
@@ -29,9 +32,9 @@ const DoseCalculatorScreen = () => {
           <p className="text-[#333333] font-medium">Calculate the exact amount of pesticide to mix per spray tank.</p>
         </header>
 
-        <main className="max-w-[800px] mx-auto px-8 w-full flex-1 flex flex-col items-center justify-center">
+        <main className="max-w-[800px] mx-auto px-4 md:px-8 w-full flex-1 flex flex-col items-center justify-center">
           
-          <div className="w-full bg-white border border-gray-100 rounded-[32px] shadow-[0_20px_40px_rgb(0,0,0,0.04)] p-10 relative overflow-hidden">
+          <div className="w-full bg-white border border-gray-100 rounded-[32px] shadow-[0_20px_40px_rgb(0,0,0,0.04)] p-6 md:p-10 relative overflow-hidden">
             
             {/* Decorative background circle */}
             <div className="absolute -top-20 -right-20 w-64 h-64 bg-gray-50 rounded-full blur-3xl opacity-60 pointer-events-none"></div>
@@ -121,6 +124,7 @@ const DoseCalculatorScreen = () => {
 
         </main>
       </div>
+      <MobileBottomNav />
     </div>
   );
 };
