@@ -1,0 +1,90 @@
+@import "tailwindcss";
+
+@theme {
+  /* ── Design System ── */
+  --color-brand-green: #00693B;      /* Heading / Logo */
+  --color-brand-green-dark: #004d2b; /* Hover / Dark */
+  --color-brand-text: #333333;       /* Body Text */
+  --color-brand-button: #FEB600;     /* Button */
+  --color-brand-button-hover: #e6a400; /* Button hover */
+  --color-brand-bg: #FFFFFF;         /* Background */
+  --color-brand-orange: #EC5017;     /* Accent */
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  font-family: 'Outfit', sans-serif;
+}
+
+h1, h2, h3, h4 {
+  font-family: 'Inter', sans-serif;
+}
+
+body {
+  background: #FFFFFF;
+  color: #333333;
+  min-height: 100vh;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 105, 59, 0.25);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 105, 59, 0.45);
+}
+
+/* Animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(254, 182, 0, 0.4); }
+  50% { box-shadow: 0 0 0 12px rgba(254, 182, 0, 0); }
+}
+
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-float { animation: float 4s ease-in-out infinite; }
+.animate-pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
+.animate-fade-in-up { animation: fade-in-up 0.5s ease-out forwards; }
+
+/* Heading gradient */
+.gradient-text {
+  background: linear-gradient(135deg, #00693B 0%, #009a57 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Glass card */
+.glass-card {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(0, 105, 59, 0.1);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+
+/* Hero gradient — green brand */
+.hero-gradient {
+  background: linear-gradient(135deg, #004d2b 0%, #00693B 60%, #009a57 100%);
+}
+
+/* Utility: brand button */
+.btn-primary {
+  background: #FEB600;
+  color: #333333;
+  font-weight: 700;
+  border-radius: 12px;
+  transition: background 0.2s;
+}
+.btn-primary:hover { background: #e6a400; }
