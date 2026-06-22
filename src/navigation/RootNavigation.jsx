@@ -2,16 +2,18 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 // Screens
+import LandingScreen from '../screens/LandingScreen';
 import AiScreen from '../screens/AiScreen';
 import ProductScreen from '../screens/ProductScreen';
-import ProductDetailScreen from '../screens/ProductDetailScreen';
-import CartScreen from '../screens/CartScreen';
-import CompareScreen from '../screens/CompareScreen';
-import DoseCalculatorScreen from '../screens/DoseCalculatorScreen';
+import SaleNowScreen from '../screens/SaleNowScreen';
 import LoginScreen from '../screens/LoginScreen';
 import PaymentScreen from '../screens/PaymentScreen';
 import OrderConfirmScreen from '../screens/OrderConfirmScreen';
+import InvoiceScreen from '../screens/InvoiceScreen';
 import VendorDashboard from '../screens/VendorDashboard';
+import PlanCheckoutScreen from '../screens/PlanCheckoutScreen';
+import PlanSuccessScreen from '../screens/PlanSuccessScreen';
+import DealerSetupScreen from '../screens/DealerSetupScreen';
 
 // Mock authentication check
 const isAuthenticated = () => {
@@ -25,7 +27,7 @@ const PrivateRoute = ({ children }) => {
 
 // Public Route Wrapper (redirects to home if already logged in)
 const PublicRoute = ({ children }) => {
-  return !isAuthenticated() ? children : <Navigate to="/" />;
+  return !isAuthenticated() ? children : <Navigate to="/vendor" />;
 };
 
 const RootNavigation = () => {
@@ -46,6 +48,12 @@ const RootNavigation = () => {
         <Route 
           path="/" 
           element={
+            <LandingScreen />
+          } 
+        />
+        <Route 
+          path="/ai" 
+          element={
             <PrivateRoute>
               <AiScreen />
             </PrivateRoute>
@@ -60,38 +68,23 @@ const RootNavigation = () => {
           } 
         />
         <Route 
-          path="/products/:id" 
+          path="/sale-now" 
           element={
             <PrivateRoute>
-              <ProductDetailScreen />
+              <SaleNowScreen />
             </PrivateRoute>
           } 
         />
         <Route 
-          path="/cart" 
+          path="/invoice/:id" 
           element={
             <PrivateRoute>
-              <CartScreen />
+              <InvoiceScreen />
             </PrivateRoute>
           } 
         />
-        <Route 
-          path="/compare" 
-          element={
-            <PrivateRoute>
-              <CompareScreen />
-            </PrivateRoute>
-          } 
-        />
-        <Route 
-          path="/calculator" 
-          element={
-            <PrivateRoute>
-              <DoseCalculatorScreen />
-            </PrivateRoute>
-          } 
-        />
-        
+
+
         <Route 
           path="/payment" 
           element={
@@ -113,6 +106,22 @@ const RootNavigation = () => {
           element={
             <PrivateRoute>
               <VendorDashboard />
+            </PrivateRoute>
+          } 
+        />
+        <Route 
+          path="/plan-checkout" 
+          element={<PlanCheckoutScreen />} 
+        />
+        <Route 
+          path="/plan-success" 
+          element={<PlanSuccessScreen />} 
+        />
+        <Route 
+          path="/setup" 
+          element={
+            <PrivateRoute>
+              <DealerSetupScreen />
             </PrivateRoute>
           } 
         />

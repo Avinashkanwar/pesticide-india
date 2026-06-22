@@ -32,6 +32,7 @@ const EMPTY_FORM = {
 
 const VendorDashboard = () => {
   const navigate = useNavigate();
+  const isDemo = localStorage.getItem('isDemo') === 'true';
 
   // Vendor Registration state
   const [vendorProfile, setVendorProfile] = useState(() => {
@@ -73,6 +74,35 @@ const VendorDashboard = () => {
   const [deleteConfirmId, setDeleteConfirmId] = useState(null);
   const [errors, setErrors] = useState({});
   const [successMsg, setSuccessMsg] = useState('');
+
+  // POS State
+  const [customers, setCustomers] = useState(() => {
+    try { 
+      const existing = localStorage.getItem('vendor_customers');
+      if (existing) return JSON.parse(existing);
+      const mockCustomers = [
+        { id: 'c_1', name: 'Ramesh Singh', phone: '+919876543210', udhaarBalance: 15500, dueDate: '15 Jun 2026' },
+        { id: 'c_2', name: 'Kisan Patel', phone: '+918765432109', udhaarBalance: 8200, dueDate: '25 Jun 2026' },
+        { id: 'c_3', name: 'Mahesh Yadav', phone: '+917654321098', udhaarBalance: 4150, dueDate: '10 Jul 2026' },
+        { id: 'c_4', name: 'Gopal Sharma', phone: '+916543210987', udhaarBalance: 12000, dueDate: '05 Jun 2026' },
+      ];
+      localStorage.setItem('vendor_customers', JSON.stringify(mockCustomers));
+      return mockCustomers;
+    } catch { return []; }
+  });
+
+  const [sales, setSales] = useState(() => {
+    try { 
+      const existing = localStorage.getItem('vendor_sales');
+      if (existing) return JSON.parse(existing);
+      const mockSales = [
+        { id: 's_1', customerName: 'Amit Patel', items: 'Nativo 75 WG', date: new Date().toISOString(), amount: 3150, method: 'Online' },
+        { id: 's_2', customerName: 'Rajesh Kumar', items: 'Coragen', date: new Date().toISOString(), amount: 3830, method: 'Cash' },
+      ];
+      localStorage.setItem('vendor_sales', JSON.stringify(mockSales));
+      return mockSales;
+    } catch { return []; }
+  });
 
   // ── Product Management ───────────────────────────
   const saveProducts = (updated) => {
@@ -152,11 +182,32 @@ const VendorDashboard = () => {
         
         <div className="max-w-[1600px] w-full mx-auto px-4 py-6 flex flex-col gap-6">
 
-          {/* Small Add Product Button */}
-          <div className="flex justify-end w-full mb-[-10px] z-10 relative">
-            <button onClick={() => { setShowForm(true); setEditingId(null); setForm(EMPTY_FORM); setErrors({}); }}
-              className="flex items-center gap-1 px-3 py-1.5 bg-[#00693B] text-white rounded-lg text-[11px] font-bold hover:bg-[#004d2b] transition-all cursor-pointer shadow-sm">
-              <Plus size={12} strokeWidth={3} /> Add Product
+          {/* Demo Mode Banner */}
+          {isDemo && (
+            <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm animate-fade-in-up">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center shrink-0">
+                  <AlertTriangle size={20} className="text-amber-600" />
+                </div>
+                <div>
+                  <h3 className="text-amber-900 font-bold text-sm">You are viewing the Demo Dashboard</h3>
+                  <p className="text-amber-700 text-xs font-medium mt-0.5">Subscribe to a plan to unlock full store setup, active support, and premium features.</p>
+                </div>
+              </div>
+              <button 
+                onClick={() => navigate('/')}
+                className="px-6 py-2 bg-amber-500 text-white rounded-lg font-bold text-xs hover:bg-amber-600 transition-colors shadow-sm shrink-0 w-full sm:w-auto"
+              >
+                View Plans
+              </button>
+            </div>
+          )}
+
+          {/* Top Actions */}
+          <div className="flex justify-end gap-3 w-full mb-[-10px] z-10 relative">
+            <button onClick={() => navigate('/sale-now')}
+              className="flex items-center gap-1.5 px-4 py-1.5 bg-amber-500 text-white rounded-lg text-[11px] font-bold hover:bg-amber-600 transition-all cursor-pointer shadow-sm">
+              <ShoppingCart size={14} strokeWidth={3} /> Sale Now
             </button>
           </div>
 
@@ -170,10 +221,11 @@ const VendorDashboard = () => {
           {/* CLEAN DASHBOARD STATS (Smaller Size) */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
             {[
-              { label: 'Monthly Revenue', value: '₹ 1.45 L', sub: '+15.4% vs last month', icon: <TrendingUp size={16} />, color: 'text-emerald-600 bg-emerald-50 border-emerald-200' },
-              { label: 'Total Debtors', value: '25', sub: 'Active accounts', icon: <User size={16} />, color: 'text-blue-600 bg-blue-50 border-blue-200' },
-              { label: 'Outstanding Amount', value: '₹ 39,850', sub: 'Across 25 debtors', icon: <FileText size={16} />, color: 'text-amber-600 bg-amber-50 border-amber-200' },
+              { label: 'Monthly Revenue', value: '₹ ' + (sales.reduce((sum, s) => sum + s.amount, 0)/1000).toFixed(1) + 'k', sub: 'Calculated from sales', icon: <TrendingUp size={16} />, color: 'text-emerald-600 bg-emerald-50 border-emerald-200' },
+              { label: 'Total Debtors', value: customers.filter(c => c.udhaarBalance > 0).length, sub: 'Active accounts', icon: <User size={16} />, color: 'text-blue-600 bg-blue-50 border-blue-200' },
+              { label: 'Outstanding Amount', value: '₹ ' + customers.reduce((sum, c) => sum + (c.udhaarBalance || 0), 0).toLocaleString('en-IN'), sub: 'Across ' + customers.filter(c => c.udhaarBalance > 0).length + ' debtors', icon: <FileText size={16} />, color: 'text-amber-600 bg-amber-50 border-amber-200' },
               { label: 'Total Products', value: 10 + products.length, sub: `${10 + inStockCount} in stock`, icon: <Package size={16} />, color: 'text-[#00693B] bg-[#F5F7E9] border-[#00693B]/30' },
+
             ].map((s, i) => (
               <div key={i} className="bg-white border border-gray-200/80 rounded-xl p-3 flex flex-col gap-1.5 relative overflow-hidden group hover:border-[#00693B]/40 hover:shadow-sm transition-all cursor-default">
                 <div className={`w-8 h-8 rounded-lg flex items-center justify-center border ${s.color} mb-0.5 shadow-sm`}>{s.icon}</div>
@@ -231,21 +283,19 @@ const VendorDashboard = () => {
                 <h2 className="text-sm font-black text-gray-800 font-inter m-0">Today's Sales</h2>
               </div>
               <div className="flex flex-col gap-4 mt-2">
-                {[
-                  { customer: 'Amit Patel', item: 'Nativo 75 WG', time: '10:30 AM', amount: '+₹ 3,150' },
-                  { customer: 'Rajesh Kumar', item: 'Coragen Insecticide', time: '11:45 AM', amount: '+₹ 3,830' },
-                  { customer: 'Vikram Yadav', item: 'Urea Fertilizer', time: '01:15 PM', amount: '+₹ 1,200' },
-                  { customer: 'Suresh Singh', item: 'Glyphosate 41%', time: '02:30 PM', amount: '+₹ 890' },
-                ].map((sale, idx) => (
-                  <div key={idx} className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-emerald-50 rounded-full flex items-center justify-center shrink-0 border border-emerald-100">
-                      <TrendingUp size={16} className="text-[#00693B]" />
+                {sales.slice(0, 4).map((sale, idx) => (
+                  <div key={idx} onClick={() => navigate(`/invoice/${sale.id}`)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-gray-50/80 cursor-pointer transition-colors group border border-transparent hover:border-gray-100">
+                    <div className="w-10 h-10 bg-emerald-50 rounded-full flex items-center justify-center shrink-0 border border-emerald-100 group-hover:bg-[#00693B] transition-colors">
+                      <TrendingUp size={16} className="text-[#00693B] group-hover:text-white" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs font-black text-gray-900 font-inter truncate m-0">{sale.customer}</p>
-                      <p className="text-[10px] font-semibold text-gray-500 m-0 truncate">{sale.item} · {sale.time}</p>
+                      <p className="text-xs font-black text-gray-900 font-inter truncate m-0 group-hover:text-[#00693B] transition-colors">{sale.customerName}</p>
+                      <p className="text-[10px] font-semibold text-gray-500 m-0 truncate">{sale.items} · {new Date(sale.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
                     </div>
-                    <p className="text-xs font-bold text-[#00693B] m-0">{sale.amount}</p>
+                    <div className="text-right">
+                      <p className="text-xs font-bold text-[#00693B] m-0">+₹ {sale.amount.toLocaleString('en-IN')}</p>
+                      <p className="text-[9px] font-bold text-gray-400 mt-0.5 uppercase tracking-widest">{sale.method}</p>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -272,27 +322,69 @@ const VendorDashboard = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {[
-                      { name: 'Ramesh Singh', phone: '+91 98765 43210', amount: '₹ 15,500', dueDate: '15 Jun 2026', status: 'Overdue' },
-                      { name: 'Kisan Patel', phone: '+91 87654 32109', amount: '₹ 8,200', dueDate: '25 Jun 2026', status: 'Upcoming' },
-                      { name: 'Mahesh Yadav', phone: '+91 76543 21098', amount: '₹ 4,150', dueDate: '10 Jul 2026', status: 'Upcoming' },
-                      { name: 'Gopal Sharma', phone: '+91 65432 10987', amount: '₹ 12,000', dueDate: '05 Jun 2026', status: 'Overdue' },
-                    ].map((debtor, idx) => (
+                    {customers.filter(c => c.udhaarBalance > 0).map((debtor, idx) => (
                       <tr key={idx} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors">
                         <td className="py-3 text-xs font-bold text-gray-900 whitespace-nowrap">{debtor.name}</td>
                         <td className="py-3 text-xs font-semibold text-gray-600 whitespace-nowrap">{debtor.phone}</td>
-                        <td className="py-3 text-xs font-black text-red-600 whitespace-nowrap">{debtor.amount}</td>
+                        <td className="py-3 text-xs font-black text-red-600 whitespace-nowrap">₹ {debtor.udhaarBalance.toLocaleString('en-IN')}</td>
                         <td className="py-3 whitespace-nowrap">
                           <div className="flex items-center gap-2">
-                            <span className="text-xs font-semibold text-gray-700">{debtor.dueDate}</span>
-                            {debtor.status === 'Overdue' && (
+                            <span className="text-xs font-semibold text-gray-700">{debtor.dueDate || 'N/A'}</span>
+                            {(!debtor.dueDate || new Date(debtor.dueDate) < new Date()) && (
                               <span className="text-[9px] font-bold bg-red-50 text-red-600 border border-red-200 px-2 py-0.5 rounded-md">Overdue</span>
                             )}
                           </div>
                         </td>
                         <td className="py-3 text-right whitespace-nowrap">
-                          <button className="inline-flex items-center gap-1 text-[10px] font-bold text-white bg-amber-500 hover:bg-amber-600 px-3 py-1.5 rounded-lg cursor-pointer transition-colors border-none shadow-sm">
-                            <AlertTriangle size={12} /> Send Reminder
+                          <button 
+                            onClick={() => window.open(`https://wa.me/${debtor.phone.replace(/\\D/g, '')}?text=${encodeURIComponent(`Namaskar ${debtor.name}, aapka store par pending udhaar ₹${debtor.udhaarBalance} baki hai. Kripya jald bhugtan karein.`)}`, '_blank')}
+                            className="inline-flex items-center gap-1 text-[10px] font-bold text-white bg-emerald-500 hover:bg-emerald-600 px-3 py-1.5 rounded-lg cursor-pointer transition-colors border-none shadow-sm"
+                          >
+                            <Phone size={12} /> WhatsApp
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          {/* New Row for Low Stock Alerts */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-3 bg-white border border-gray-200/70 rounded-2xl p-5 flex flex-col gap-4 overflow-hidden">
+              <div className="flex items-center justify-between mb-1">
+                <div className="flex items-center gap-2">
+                  <div className="w-[3px] h-4 bg-amber-500 rounded-sm" />
+                  <h2 className="text-sm font-black text-gray-800 font-inter m-0">Low Stock Alerts</h2>
+                </div>
+              </div>
+              <div className="overflow-x-auto -mx-2 px-2">
+                <table className="w-full text-left border-collapse min-w-[600px]">
+                  <thead>
+                    <tr className="border-b border-gray-100">
+                      <th className="pb-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest whitespace-nowrap">Product Name</th>
+                      <th className="pb-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest whitespace-nowrap">Category</th>
+                      <th className="pb-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest whitespace-nowrap">Status</th>
+                      <th className="pb-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest text-right whitespace-nowrap">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {products.filter(p => p.stock === 'Low Stock' || p.stock === 'Out of Stock').length === 0 ? (
+                      <tr><td colSpan="4" className="py-4 text-center text-xs text-gray-400 font-medium">All products are adequately stocked.</td></tr>
+                    ) : products.filter(p => p.stock === 'Low Stock' || p.stock === 'Out of Stock').map((p, idx) => (
+                      <tr key={idx} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors">
+                        <td className="py-3 text-xs font-bold text-gray-900 whitespace-nowrap">{p.name}</td>
+                        <td className="py-3 text-xs font-semibold text-gray-600 whitespace-nowrap">{p.category}</td>
+                        <td className="py-3 whitespace-nowrap">
+                          <span className={`text-[9px] font-bold px-2 py-0.5 rounded-md border ${p.stock === 'Low Stock' ? 'bg-amber-50 text-amber-600 border-amber-200' : 'bg-red-50 text-red-600 border-red-200'}`}>
+                            {p.stock}
+                          </span>
+                        </td>
+                        <td className="py-3 text-right whitespace-nowrap">
+                          <button onClick={() => handleEdit(p)} className="inline-flex items-center gap-1 text-[10px] font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-lg cursor-pointer transition-colors border-none shadow-sm">
+                            <Pencil size={12} /> Update Stock
                           </button>
                         </td>
                       </tr>
@@ -420,6 +512,7 @@ const VendorDashboard = () => {
 
 
         </div>
+        
       </div>
       <MobileBottomNav />
     </div>

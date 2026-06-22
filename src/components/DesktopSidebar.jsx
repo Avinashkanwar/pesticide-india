@@ -1,6 +1,6 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Bot, Scale, Store, PackageSearch } from 'lucide-react';
+import { LayoutDashboard, Bot, Scale, Store, PackageSearch, ShoppingCart, Package } from 'lucide-react';
 
 const DesktopSidebar = () => {
   const navigate = useNavigate();
@@ -34,23 +34,24 @@ const DesktopSidebar = () => {
           title="Vendor Dashboard" 
         />
         <SidebarButton 
+          icon={<ShoppingCart />} 
+          isActive={isActive('sale-now')} 
+          onClick={() => navigate('/sale-now')} 
+          title="Sale Now" 
+        />
+        <SidebarButton 
           icon={<Bot />} 
-          isActive={isActive('home')} 
-          onClick={() => navigate('/')} 
+          isActive={isActive('ai')} 
+          onClick={() => navigate('/ai')} 
           title="AI Assistant" 
         />
         <SidebarButton 
-          icon={<PackageSearch />} 
+          icon={<Package />} 
           isActive={isActive('products')} 
           onClick={() => navigate('/products')} 
           title="All Products" 
         />
-        <SidebarButton 
-          icon={<Scale />} 
-          isActive={isActive('compare')} 
-          onClick={() => navigate('/compare')} 
-          title="Compare" 
-        />
+
 
       </nav>
 

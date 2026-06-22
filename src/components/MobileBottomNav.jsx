@@ -1,6 +1,6 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Bot, Scale, Store, PackageSearch } from 'lucide-react';
+import { LayoutDashboard, Bot, Scale, Store, PackageSearch, ShoppingCart, Package } from 'lucide-react';
 
 const MobileBottomNav = () => {
   const navigate = useNavigate();
@@ -22,23 +22,24 @@ const MobileBottomNav = () => {
         onClick={() => navigate('/vendor')} 
       />
       <NavItem 
-        icon={<Bot />} 
-        label="AI Assist" 
-        isActive={isActive('home')} 
-        onClick={() => navigate('/')} 
+        icon={<ShoppingCart />} 
+        label="Sale Now" 
+        isActive={isActive('sale-now')} 
+        onClick={() => navigate('/sale-now')} 
       />
       <NavItem 
-        icon={<PackageSearch />} 
+        icon={<Bot />} 
+        label="AI Assist" 
+        isActive={isActive('ai')} 
+        onClick={() => navigate('/ai')} 
+      />
+      <NavItem 
+        icon={<Package />} 
         label="Products" 
         isActive={isActive('products')} 
         onClick={() => navigate('/products')} 
       />
-      <NavItem 
-        icon={<Scale />} 
-        label="Compare" 
-        isActive={isActive('compare')} 
-        onClick={() => navigate('/compare')} 
-      />
+
 
     </div>
   );

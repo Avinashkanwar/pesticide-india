@@ -159,6 +159,28 @@ const alerts = [
 
 const HomeScreen = () => {
   const navigate = useNavigate();
+  const isDemo = localStorage.getItem('isDemo') === 'true';
+
+  if (isDemo) {
+    return (
+      <div className="min-h-screen font-outfit flex overflow-hidden bg-gray-50">
+        <DesktopSidebar />
+        <div className="flex-1 ml-0 md:ml-24 flex flex-col min-w-0 h-screen overflow-y-auto pb-20 md:pb-10">
+          <Header />
+          <div className="flex-1 flex flex-col items-center justify-center p-8 text-center animate-fade-in-up">
+            <div className="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mb-6">
+              <span className="text-4xl">🔒</span>
+            </div>
+            <h2 className="text-3xl font-black text-gray-900 font-inter mb-4">Premium Feature Locked</h2>
+            <p className="text-gray-500 font-medium max-w-md mb-8">The AI Precision Farming Assistant is not available in Demo Mode. Subscribe to unlock crop diagnosis.</p>
+            <button onClick={() => navigate('/')} className="px-8 py-4 bg-[#00693B] text-white rounded-xl font-bold hover:bg-[#004d2b] transition-colors shadow-lg shadow-[#00693B]/20">View Plans</button>
+          </div>
+        </div>
+        <MobileBottomNav />
+      </div>
+    );
+  }
+
   const [aiCrop, setAiCrop] = useState('');
   const [aiAge, setAiAge] = useState('');
   const [aiDisease, setAiDisease] = useState('');

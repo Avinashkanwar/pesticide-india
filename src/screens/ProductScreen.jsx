@@ -1,9 +1,11 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import DesktopSidebar from '../components/DesktopSidebar';
 import MobileBottomNav from '../components/MobileBottomNav';
 import Header from '../components/Header';
 import { ShoppingCart, Star, Plus, PackageSearch } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
+import { Lock } from 'lucide-react';
 
 const DUMMY_PRODUCTS = [
   {
@@ -119,6 +121,29 @@ const DUMMY_PRODUCTS = [
 ];
 
 const ProductScreen = () => {
+  const navigate = useNavigate();
+  const isDemo = localStorage.getItem('isDemo') === 'true';
+
+  if (isDemo) {
+    return (
+      <div className="min-h-screen font-outfit flex overflow-hidden bg-gray-50">
+        <DesktopSidebar />
+        <div className="flex-1 ml-0 md:ml-24 flex flex-col min-w-0 h-screen overflow-y-auto pb-20 md:pb-10">
+          <Header />
+          <div className="flex-1 flex flex-col items-center justify-center p-8 text-center animate-fade-in-up">
+            <div className="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mb-6">
+              <span className="text-4xl">🔒</span>
+            </div>
+            <h2 className="text-3xl font-black text-gray-900 font-inter mb-4">Premium Feature Locked</h2>
+            <p className="text-gray-500 font-medium max-w-md mb-8">Product Management is not available in the Demo Dashboard. Subscribe to a plan to unlock full inventory management.</p>
+            <button onClick={() => navigate('/')} className="px-8 py-4 bg-[#00693B] text-white rounded-xl font-bold hover:bg-[#004d2b] transition-colors shadow-lg shadow-[#00693B]/20">View Plans</button>
+          </div>
+        </div>
+        <MobileBottomNav />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen font-outfit flex overflow-hidden bg-gray-50/50">
       <DesktopSidebar />
@@ -130,9 +155,9 @@ const ProductScreen = () => {
             <div className="w-10 h-10 bg-[#00693B] rounded-xl flex items-center justify-center shadow-sm">
               <PackageSearch className="text-white" size={20} />
             </div>
-            <h1 className="text-2xl md:text-3xl font-black text-gray-900 tracking-tight font-inter m-0">All Products</h1>
+            <h1 className="text-2xl md:text-3xl font-black text-gray-900 tracking-tight font-inter m-0">Product Inventory</h1>
           </div>
-          <p className="text-sm font-semibold text-gray-500 max-w-xl">Browse our full catalog of premium agricultural solutions, certified pesticides, and state-of-the-art sprayers.</p>
+          <p className="text-sm font-semibold text-gray-500 max-w-xl">Manage and track your agricultural products, pesticides, and sprayers inventory.</p>
         </header>
 
         <main className="max-w-[1600px] mx-auto px-4 md:px-8 w-full flex-1">
