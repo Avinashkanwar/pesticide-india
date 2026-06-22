@@ -1,6 +1,6 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Store, Bot, Scale, Calculator, BookOpen } from 'lucide-react';
+import { LayoutDashboard, Bot, Scale, Store, PackageSearch } from 'lucide-react';
 
 const DesktopSidebar = () => {
   const navigate = useNavigate();
@@ -28,16 +28,22 @@ const DesktopSidebar = () => {
       {/* Navigation Icons */}
       <nav className="flex flex-col items-center gap-6 mt-2">
         <SidebarButton 
-          icon={<LayoutDashboard />} 
-          isActive={isActive('home')} 
-          onClick={() => navigate('/')} 
-          title="Home" 
+          icon={<Store />} 
+          isActive={isActive('vendor')} 
+          onClick={() => navigate('/vendor')} 
+          title="Vendor Dashboard" 
         />
         <SidebarButton 
-          icon={<Store />} 
+          icon={<Bot />} 
+          isActive={isActive('home')} 
+          onClick={() => navigate('/')} 
+          title="AI Assistant" 
+        />
+        <SidebarButton 
+          icon={<PackageSearch />} 
           isActive={isActive('products')} 
           onClick={() => navigate('/products')} 
-          title="Products" 
+          title="All Products" 
         />
         <SidebarButton 
           icon={<Scale />} 
@@ -45,24 +51,7 @@ const DesktopSidebar = () => {
           onClick={() => navigate('/compare')} 
           title="Compare" 
         />
-        <SidebarButton 
-          icon={<Calculator />} 
-          isActive={isActive('calculator')} 
-          onClick={() => navigate('/calculator')} 
-          title="Calculator" 
-        />
-        <SidebarButton 
-          icon={<BookOpen />} 
-          isActive={isActive('articles')} 
-          onClick={() => navigate('/articles')} 
-          title="Articles" 
-        />
-        <SidebarButton 
-          icon={<Bot />} 
-          isActive={isActive('chat')} 
-          onClick={() => navigate('/chat')} 
-          title="Chat" 
-        />
+
       </nav>
 
       {/* Footer Icons */}

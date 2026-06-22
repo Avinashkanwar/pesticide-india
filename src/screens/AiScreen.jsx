@@ -16,9 +16,13 @@ import {
   FlaskConical,
   Leaf,
   Sparkles,
-  ChevronRight
+  ChevronRight,
+  ShoppingCart,
+  Store
 } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
+import { getCartCount } from '../utils/cartHelper';
+import Header from '../components/Header';
 
 const products = [
   {
@@ -166,18 +170,123 @@ const HomeScreen = () => {
   const [searchFocused, setSearchFocused] = useState(false);
   const [headerTipIndex, setHeaderTipIndex] = useState(0);
   const isLoggedIn = !!localStorage.getItem('token');
+  const [cartCount, setCartCount] = useState(getCartCount());
+  const [language, setLanguage] = useState(localStorage.getItem('lang') || 'en');
+  const [allProducts, setAllProducts] = useState(() => {
+    try {
+      const vendorProducts = JSON.parse(localStorage.getItem('vendor_products') || '[]');
+      return [...products, ...vendorProducts];
+    } catch {
+      return products;
+    }
+  });
+
+  const t = {
+    en: {
+      searchPlaceholder: "Search pesticides, sprayers, fertilizers...",
+      about: "About",
+      logout: "Logout",
+      login: "Login",
+      allProducts: "All Products",
+      items: "items",
+      viewAll: "View All",
+      aiAssistant: "AI Crop Assistant",
+      precisionFarming: "Powered by Precision Farming",
+      aiDesc: "Select your crop, its growth stage, and the issue you see to get an instant precision solution.",
+      selectCrop: "Select Crop (फसल चुनें)",
+      cropStage: "Crop Stage (अवस्था चुनें)",
+      observedIssue: "Observed Issue (समस्या चुनें)",
+      analyze: "Analyze with AI",
+      analyzing: "Analyzing data...",
+      crossRef: "Cross-referencing with local conditions",
+      noProducts: "No products found",
+      adjustSearch: "Try adjusting your search or category filter",
+      clearFilters: "Clear Filters",
+      categories: {
+        All: "All",
+        Pesticides: "Pesticides",
+        Fertilizers: "Fertilizers",
+        Sprayers: "Sprayers",
+        Nets: "Nets"
+      }
+    },
+    hi: {
+      searchPlaceholder: "कीटनाशक, स्प्रेयर, उर्वरक खोजें...",
+      about: "हमारे बारे में",
+      logout: "लॉगआउट",
+      login: "लॉगिन",
+      allProducts: "सभी उत्पाद",
+      items: "वस्तुएं",
+      viewAll: "सभी देखें",
+      aiAssistant: "एआई फसल सहायक",
+      precisionFarming: "सटीक खेती द्वारा संचालित",
+      aiDesc: "सटीक समाधान पाने के लिए अपनी फसल, विकास की अवस्था और देखी गई समस्या चुनें।",
+      selectCrop: "फसल चुनें",
+      cropStage: "फसल की अवस्था",
+      observedIssue: "समस्या चुनें",
+      analyze: "एआई से विश्लेषण करें",
+      analyzing: "डेटा का विश्लेषण हो रहा है...",
+      crossRef: "स्थानीय परिस्थितियों के साथ मिलान किया जा रहा है",
+      noProducts: "कोई उत्पाद नहीं मिला",
+      adjustSearch: "खोज या श्रेणी फ़िल्टर को बदलने का प्रयास करें",
+      clearFilters: "फ़िल्टर साफ़ करें",
+      categories: {
+        All: "सभी",
+        Pesticides: "कीटनाशक",
+        Fertilizers: "उर्वरक",
+        Sprayers: "स्प्रेयर",
+        Nets: "नेट"
+      }
+    },
+    hinglish: {
+      searchPlaceholder: "Pesticides, sprayers, fertilizers search karein...",
+      about: "About Us",
+      logout: "Logout",
+      login: "Login",
+      allProducts: "Sabh Products",
+      items: "items",
+      viewAll: "Sabh Dekhein",
+      aiAssistant: "AI Crop Assistant",
+      precisionFarming: "Precision Farming dwara powered",
+      aiDesc: "Apni fasal, growth stage aur dekhi gayi problem select karein, aur turant sahi solution payein.",
+      selectCrop: "Fasal select karein",
+      cropStage: "Fasal ki stage",
+      observedIssue: "Problem select karein",
+      analyze: "AI se analyze karein",
+      analyzing: "Data analyze ho raha hai...",
+      crossRef: "Local conditions se check ho raha hai",
+      noProducts: "Koi product nahi mila",
+      adjustSearch: "Search ya category filter change karke dekhein",
+      clearFilters: "Filters clear karein",
+      categories: {
+        All: "Sabh",
+        Pesticides: "Pesticides",
+        Fertilizers: "Fertilizers",
+        Sprayers: "Sprayers",
+        Nets: "Nets"
+      }
+    }
+  }[language];
+
+  useEffect(() => {
+    const handleCartUpdate = () => {
+      setCartCount(getCartCount());
+    };
+    window.addEventListener('cart-updated', handleCartUpdate);
+    return () => window.removeEventListener('cart-updated', handleCartUpdate);
+  }, []);
 
   const categories = ['All', 'Pesticides', 'Fertilizers', 'Sprayers', 'Nets'];
 
   const getCount = (catName) => {
-    if (catName === 'All') return products.length;
-    return products.filter(p => p.category.toLowerCase() === catName.toLowerCase()).length;
+    if (catName === 'All') return allProducts.length;
+    return allProducts.filter(p => p.category.toLowerCase() === catName.toLowerCase()).length;
   };
 
-  const filteredProducts = products.filter((product) => {
+  const filteredProducts = allProducts.filter((product) => {
     const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
                           product.brand.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          product.tags.some(t => t.toLowerCase().includes(searchQuery.toLowerCase()));
+                          (product.tags && product.tags.some(t => t.toLowerCase().includes(searchQuery.toLowerCase())));
     const matchesCategory = activeCategory === 'All' || 
                             product.category.toLowerCase() === activeCategory.toLowerCase();
     return matchesSearch && matchesCategory;
@@ -206,170 +315,18 @@ const HomeScreen = () => {
 
       <div className="flex-1 ml-0 md:ml-24 flex flex-col min-w-0 h-screen overflow-y-auto pb-16 md:pb-0">
 
-        {/* ── HEADER ── */}
-        <header className="px-6 md:px-10 py-6 md:py-8 flex items-center justify-between gap-4 sticky top-0 z-50 bg-gray-100/70 backdrop-blur-xl">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-[#00693B] rounded-xl flex items-center justify-center text-white font-black text-lg shadow-md font-inter tracking-tighter">PI</div>
-            <div>
-              <h1 className="text-xl font-black text-[#111827] m-0 leading-[1.1] font-inter tracking-tight">
-                Pesticide<span className="text-[#00693B]">India</span>
-              </h1>
-              <p className="text-[11px] font-semibold text-gray-500 m-0 uppercase tracking-widest mt-[2px]">Smart Farming Solutions</p>
-            </div>
-          </div>
+        <Header />
 
-          {/* Desktop Ticker */}
-          <div className="hidden lg:flex items-center bg-[#fffbeb] border border-[#fde68a] px-3.5 py-1.5 rounded-full shadow-sm max-w-[480px] flex-1 overflow-hidden">
-            <span className={`w-2 h-2 rounded-full mr-2 shrink-0 animate-pulse ${alertIndex === 0 ? 'bg-amber-500' : 'bg-emerald-500'}`}></span>
-            <span
-              key={alertIndex}
-              className="text-[11px] font-bold text-amber-800 whitespace-nowrap overflow-hidden text-ellipsis m-0 font-outfit animate-[fadeInUp_0.5s_ease]"
-            >
-              {alerts[alertIndex].text}
-            </span>
-          </div>
-
-          <div className="flex items-center gap-4">
-            <button
-              id="about-btn"
-              onClick={() => navigate('/about')}
-              className="text-[13px] font-semibold text-gray-500 hover:text-[#00693B] transition-colors font-outfit cursor-pointer"
-            >
-              About
-            </button>
-
-            {!isLoggedIn && (
-              <button
-                id="login-btn"
-                onClick={() => navigate('/login')}
-                className="px-5 py-1.5 bg-white border-[1.5px] border-[#00693B] rounded-lg text-[13px] font-bold text-[#00693B] hover:bg-[#00693B] hover:text-white transition-all font-outfit cursor-pointer"
-              >
-                Login
-              </button>
-            )}
-
-            {isLoggedIn && (
-              <button
-                id="logout-btn"
-                onClick={() => { localStorage.removeItem('token'); navigate('/login'); }}
-                className="px-4 py-1.5 bg-white border-[1.5px] border-red-300 rounded-lg text-[13px] font-semibold text-red-600 hover:bg-red-50 hover:border-red-500 transition-all font-outfit cursor-pointer"
-              >
-                Logout
-              </button>
-            )}
-          </div>
-        </header>
-
-        {/* Mobile Ticker */}
-        <div className="lg:hidden bg-[#fffbeb] border-b border-[#fde68a] px-4 py-2 flex items-center shadow-sm">
-          <span className={`w-2 h-2 rounded-full mr-2 shrink-0 animate-pulse ${alertIndex === 0 ? 'bg-amber-500' : 'bg-emerald-500'}`}></span>
-          <span
-            key={alertIndex + 'mobile'}
-            className="text-[11px] font-bold text-amber-800 whitespace-nowrap overflow-hidden text-ellipsis m-0 font-outfit animate-[fadeInUp_0.5s_ease]"
-          >
-            {alerts[alertIndex].text}
-          </span>
-        </div>
 
 
         {/* ── MAIN GRID ── */}
-        <main className="flex-1 px-4 md:px-7 pt-6 md:pt-8 flex flex-col lg:flex-row gap-6 items-start pb-6">
+        <main className="flex-1 px-4 md:px-7 pt-6 md:pt-8 flex flex-col items-center pb-6">
 
-          {/* LEFT: Products */}
-          <div className="flex-1 min-w-0 flex flex-col gap-5">
-
-            {/* Search */}
-            <div className={`flex items-center gap-2 glass-panel rounded-xl py-3 px-4 transition-colors duration-200 ${searchFocused ? 'border-[#00693B] ring-2 ring-[#00693B]/10' : 'border-[#00693B]/10'}`}>
-              <Search size={16} className={`shrink-0 transition-colors duration-200 ${searchFocused ? 'text-[#00693B]' : 'text-gray-400'}`} />
-              <input
-                id="product-search"
-                type="text"
-                placeholder="Search pesticides, sprayers, fertilizers..."
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-                onFocus={() => setSearchFocused(true)}
-                onBlur={() => setSearchFocused(false)}
-                className="flex-1 border-none outline-none text-[13px] text-gray-900 font-medium bg-transparent font-outfit placeholder-gray-400"
-              />
-              {searchQuery && (
-                <button onClick={() => setSearchQuery('')} className="bg-transparent border-none text-gray-400 hover:text-gray-700 cursor-pointer p-0 font-bold text-xs">✕</button>
-              )}
-            </div>
-
-            {/* Category Pills */}
-            <div className="flex gap-2.5 overflow-x-auto pb-1 scrollbar-hide">
-              {categories.map(cat => {
-                const isActive = activeCategory === cat;
-                return (
-                  <button
-                    key={cat}
-                    id={`cat-${cat.toLowerCase()}`}
-                    onClick={() => setActiveCategory(cat)}
-                    className={`flex items-center gap-1.5 py-[7px] px-3.5 rounded-[10px] text-[12px] font-bold border transition-all duration-200 whitespace-nowrap font-outfit cursor-pointer ${
-                      isActive 
-                        ? 'bg-[#00693B] text-white border-[#00693B]' 
-                        : 'bg-white text-gray-600 border-gray-200 hover:border-[#00693B] hover:text-[#00693B]'
-                    }`}
-                  >
-                    {cat}
-                    <span className={`text-[10px] font-extrabold py-0.5 px-1.5 rounded-full ${
-                      isActive ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-400'
-                    }`}>
-                      {getCount(cat)}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Section Header */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="w-[3px] h-4 bg-[#00693B] rounded-sm"></div>
-                <h2 className="text-[14px] font-bold text-gray-900 m-0 font-inter">
-                  {activeCategory === 'All' ? 'All Products' : activeCategory}
-                </h2>
-                <span className="text-[11px] text-gray-400 font-medium">{filteredProducts.length} items</span>
-              </div>
-              <button
-                id="view-all-btn"
-                onClick={() => navigate('/products')}
-                className="flex items-center gap-1 text-[12px] font-semibold text-gray-400 bg-transparent border-none cursor-pointer hover:text-[#00693B] transition-colors duration-150"
-              >
-                View All <ArrowRight size={13}/>
-              </button>
-            </div>
-
-            {/* Product Grid */}
-            {filteredProducts.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-                {filteredProducts.map((product, i) => (
-                  <div
-                    key={product.id}
-                    className="animate-[fadeInUp_0.5s_ease]"
-                    style={{ animationDelay: `${i * 50}ms` }}
-                  >
-                    <ProductCard product={product} isSmall={true} />
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="flex flex-col items-center justify-center py-12 px-4 glass-panel rounded-xl border-dashed gap-1">
-                <div className="text-[32px] mb-1">🔍</div>
-                <p className="text-[14px] font-bold text-gray-900 m-0">No products found</p>
-                <p className="text-[12px] text-gray-400 m-0">Try adjusting your search or category filter</p>
-                <button
-                  onClick={() => { setSearchQuery(''); setActiveCategory('All'); }}
-                  className="py-1.5 px-4 bg-[#00693B] text-white border-none rounded-lg text-[12px] font-semibold cursor-pointer mt-2"
-                >
-                  Clear Filters
-                </button>
-              </div>
-            )}
-          </div>
-
-          {/* RIGHT: Sidebar Panels */}
-          <div className="w-full lg:w-[300px] xl:w-[350px] flex flex-col gap-5 shrink-0 lg:sticky lg:top-32 lg:h-[calc(100vh-10rem)] lg:overflow-y-auto pb-8 custom-scrollbar">
+          {/* AI and Tips Panels */}
+          <div className="w-full max-w-[1200px] flex flex-col lg:flex-row gap-6 pb-8">
+            
+            {/* LEFT COLUMN: Input Form & Tips */}
+            <div className="w-full lg:w-[350px] flex flex-col gap-5 shrink-0 lg:sticky lg:top-8 h-max">
 
             {/* AI Crop Assistant */}
             <div className="glass-panel rounded-xl p-4">
@@ -391,11 +348,11 @@ const HomeScreen = () => {
               {aiStatus === 'idle' && (
                 <div className="flex flex-col gap-3">
                   <p className="text-[12px] text-gray-600 m-0 leading-snug">
-                    अपनी फसल, उसकी अवस्था और बीमारी चुनें, और तुरंत सटीक समाधान पाएं।
+                    {t.aiDesc}
                   </p>
                   
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">फसल चुनें (Select Crop)</label>
+                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">{t.selectCrop}</label>
                     <select value={aiCrop} onChange={e => setAiCrop(e.target.value)} className="w-full py-2 px-3 bg-gray-50 border border-gray-200 rounded-lg text-[12px] text-gray-900 font-semibold outline-none transition-colors duration-200 appearance-none font-outfit focus:border-[#00693B]">
                       <option value="">-- फसल चुनें --</option>
                       <option value="गेहूँ (Wheat)">गेहूँ (Wheat)</option>
@@ -407,7 +364,7 @@ const HomeScreen = () => {
                   </div>
 
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">फसल की अवस्था (Crop Stage)</label>
+                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">{t.cropStage}</label>
                     <select value={aiAge} onChange={e => setAiAge(e.target.value)} className="w-full py-2 px-3 bg-gray-50 border border-gray-200 rounded-lg text-[12px] text-gray-900 font-semibold outline-none transition-colors duration-200 appearance-none font-outfit focus:border-[#00693B]">
                       <option value="">-- अवस्था चुनें --</option>
                       <option value="पौध (Seedling)">पौध (Seedling)</option>
@@ -419,7 +376,7 @@ const HomeScreen = () => {
                   </div>
 
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">बीमारी/समस्या (Observed Issue)</label>
+                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">{t.observedIssue}</label>
                     <select value={aiDisease} onChange={e => setAiDisease(e.target.value)} className="w-full py-2 px-3 bg-gray-50 border border-gray-200 rounded-lg text-[12px] text-gray-900 font-semibold outline-none transition-colors duration-200 appearance-none font-outfit focus:border-[#00693B]">
                       <option value="">-- समस्या चुनें --</option>
                       <option value="सफेद मक्खी (Whitefly)">सफेद मक्खी (Whitefly)</option>
@@ -438,11 +395,11 @@ const HomeScreen = () => {
                     onClick={() => {
                       setAiStatus('analyzing');
                       setTimeout(() => {
-                        navigate('/chat', { state: { crop: aiCrop, age: aiAge, disease: aiDisease } });
+                        setAiStatus('answered');
                       }, 2000);
                     }}
                   >
-                    Analyze with AI <Sparkles size={14} color="#1a1a1a" />
+                    {t.analyze} <Sparkles size={14} color="#1a1a1a" />
                   </button>
                 </div>
               )}
@@ -450,8 +407,8 @@ const HomeScreen = () => {
               {aiStatus === 'analyzing' && (
                 <div className="flex flex-col items-center justify-center py-6 px-4 bg-gray-50 rounded-xl border border-gray-100 mt-2">
                   <div className="w-6 h-6 border-2 border-[#FEB600] border-t-transparent rounded-full animate-spin mb-2.5"></div>
-                  <p className="text-[12px] font-bold text-gray-900 m-0 text-center">Analyzing {aiCrop} {aiDisease} data...</p>
-                  <p className="text-[10px] text-gray-500 m-0 mt-1 text-center font-medium">Cross-referencing with local conditions</p>
+                  <p className="text-[12px] font-bold text-gray-900 m-0 text-center">{t.analyzing}</p>
+                  <p className="text-[10px] text-gray-500 m-0 mt-1 text-center font-medium">{t.crossRef}</p>
                 </div>
               )}
 
@@ -505,6 +462,74 @@ const HomeScreen = () => {
                   </div>
                 ))}
               </div>
+            </div>
+            </div>
+            
+            {/* RIGHT COLUMN: AI Answer Results */}
+            <div className="flex-1 flex flex-col gap-5">
+              {aiStatus === 'idle' && (
+                <div className="flex-1 min-h-[400px] border-2 border-dashed border-[#00693B]/20 rounded-3xl flex flex-col items-center justify-center p-8 text-center bg-white/30 backdrop-blur-sm">
+                  <div className="w-16 h-16 bg-[#F5F7E9] rounded-2xl flex items-center justify-center mb-4">
+                    <Sparkles size={32} color="#00693B" />
+                  </div>
+                  <h3 className="text-lg font-black text-gray-900 mb-2">Ready to Assist</h3>
+                  <p className="text-sm text-gray-500 font-medium max-w-sm">Select your crop, stage, and issue on the left, then click analyze to get precision farming recommendations.</p>
+                </div>
+              )}
+
+              {aiStatus === 'analyzing' && (
+                <div className="flex-1 min-h-[400px] border border-gray-100 rounded-3xl flex flex-col items-center justify-center p-8 text-center bg-white shadow-sm">
+                  <div className="w-16 h-16 bg-[#FEB600]/10 rounded-2xl flex items-center justify-center mb-4">
+                    <div className="w-8 h-8 border-4 border-[#FEB600] border-t-transparent rounded-full animate-spin"></div>
+                  </div>
+                  <h3 className="text-lg font-black text-gray-900 mb-2">{t.analyzing}</h3>
+                  <p className="text-sm text-gray-500 font-medium">{t.crossRef}</p>
+                </div>
+              )}
+
+              {aiStatus === 'answered' && (
+                <div className="flex-1 bg-white rounded-3xl border border-gray-100 shadow-sm flex flex-col overflow-hidden">
+                  <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-[#F5F7E9]">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-[#00693B] rounded-xl flex items-center justify-center">
+                        <Sparkles size={20} className="text-white" />
+                      </div>
+                      <div>
+                        <h2 className="font-bold text-base text-gray-900 m-0 leading-tight">Diagnosis Complete</h2>
+                        <p className="text-xs font-semibold text-[#00693B] m-0">Precision Farming AI</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="p-6 flex flex-col gap-6 overflow-y-auto">
+                    {/* User Query summary */}
+                    <div className="self-end max-w-[85%] bg-[#00693B] text-white p-4 rounded-2xl rounded-tr-sm shadow-sm">
+                      <p className="text-sm font-medium leading-relaxed m-0">I have a problem with my <strong>{aiCrop}</strong>. It's in the <strong>{aiAge}</strong> stage, and I've noticed <strong>{aiDisease}</strong>.</p>
+                    </div>
+                    
+                    {/* AI Answer */}
+                    <div className="self-start max-w-[90%] bg-gray-50 text-gray-800 p-5 rounded-2xl rounded-tl-sm border border-gray-100 shadow-sm">
+                      <p className="text-sm leading-relaxed m-0 mb-4 font-medium text-gray-600">
+                        Based on your description of <strong className="text-gray-900">{aiDisease}</strong> in <strong className="text-gray-900">{aiCrop}</strong> during the <strong className="text-gray-900">{aiAge}</strong> stage, here is your precision action plan:
+                      </p>
+                      
+                      <div className="flex flex-col gap-3">
+                        <div className="p-3 bg-red-50 border border-red-100 rounded-xl">
+                          <h4 className="text-xs font-black text-red-700 m-0 mb-1 flex items-center gap-1"><AlertTriangle size={14}/> Immediate Action</h4>
+                          <p className="text-xs text-red-600 m-0 font-medium">Isolate affected areas if possible. Do not over-water the plants.</p>
+                        </div>
+                        
+                        <div className="p-3 bg-[#F5F7E9] border border-[#00693B]/20 rounded-xl">
+                          <h4 className="text-xs font-black text-[#00693B] m-0 mb-2 flex items-center gap-1"><Leaf size={14}/> Recommended Treatment</h4>
+                          <p className="text-xs text-gray-700 m-0 font-medium leading-relaxed">
+                            Apply a systemic pesticide suitable for {aiDisease}. Ensure you spray early morning or late evening.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
           </div>

@@ -2,14 +2,16 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 // Screens
-import HomeScreen from '../screens/HomeScreen';
+import AiScreen from '../screens/AiScreen';
 import ProductScreen from '../screens/ProductScreen';
-import ChatScreen from '../screens/ChatScreen';
+import ProductDetailScreen from '../screens/ProductDetailScreen';
+import CartScreen from '../screens/CartScreen';
 import CompareScreen from '../screens/CompareScreen';
 import DoseCalculatorScreen from '../screens/DoseCalculatorScreen';
-import ArticleScreen from '../screens/ArticleScreen';
 import LoginScreen from '../screens/LoginScreen';
-import ArticleDetail from '../components/ArticleDetail';
+import PaymentScreen from '../screens/PaymentScreen';
+import OrderConfirmScreen from '../screens/OrderConfirmScreen';
+import VendorDashboard from '../screens/VendorDashboard';
 
 // Mock authentication check
 const isAuthenticated = () => {
@@ -45,7 +47,7 @@ const RootNavigation = () => {
           path="/" 
           element={
             <PrivateRoute>
-              <HomeScreen />
+              <AiScreen />
             </PrivateRoute>
           } 
         />
@@ -58,10 +60,18 @@ const RootNavigation = () => {
           } 
         />
         <Route 
-          path="/chat" 
+          path="/products/:id" 
           element={
             <PrivateRoute>
-              <ChatScreen />
+              <ProductDetailScreen />
+            </PrivateRoute>
+          } 
+        />
+        <Route 
+          path="/cart" 
+          element={
+            <PrivateRoute>
+              <CartScreen />
             </PrivateRoute>
           } 
         />
@@ -81,19 +91,28 @@ const RootNavigation = () => {
             </PrivateRoute>
           } 
         />
+        
         <Route 
-          path="/articles" 
+          path="/payment" 
           element={
             <PrivateRoute>
-              <ArticleScreen />
+              <PaymentScreen />
             </PrivateRoute>
           } 
         />
         <Route 
-          path="/articles/:id" 
+          path="/order-confirm" 
           element={
             <PrivateRoute>
-              <ArticleDetail />
+              <OrderConfirmScreen />
+            </PrivateRoute>
+          } 
+        />
+        <Route 
+          path="/vendor" 
+          element={
+            <PrivateRoute>
+              <VendorDashboard />
             </PrivateRoute>
           } 
         />

@@ -1,8 +1,8 @@
 import React from 'react';
 import DesktopSidebar from '../components/DesktopSidebar';
 import MobileBottomNav from '../components/MobileBottomNav';
-import TopNav from '../components/TopNav';
-import { ShoppingCart, Star, Plus } from 'lucide-react';
+import Header from '../components/Header';
+import { ShoppingCart, Star, Plus, PackageSearch } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
 
 const DUMMY_PRODUCTS = [
@@ -120,14 +120,19 @@ const DUMMY_PRODUCTS = [
 
 const ProductScreen = () => {
   return (
-    <div className="min-h-screen font-sans flex overflow-hidden" style={{background: 'transparent'}}>
+    <div className="min-h-screen font-outfit flex overflow-hidden bg-gray-50/50">
       <DesktopSidebar />
       
-      <div className="flex-1 ml-0 md:ml-32 flex flex-col min-w-0 h-screen overflow-y-auto pb-20 md:pb-10">
-        <TopNav />
-        <header className="pt-6 pb-6 px-4 md:px-8 max-w-[1600px] w-full mx-auto">
-          <h1 className="text-4xl font-extrabold text-[#00693B] tracking-tight mb-2">All Products</h1>
-          <p className="text-[#333333] font-medium">Browse our full catalog of agricultural solutions and pesticides.</p>
+      <div className="flex-1 ml-0 md:ml-24 flex flex-col min-w-0 h-screen overflow-y-auto pb-20 md:pb-10">
+        <Header />
+        <header className="pt-8 pb-6 px-4 md:px-8 max-w-[1600px] w-full mx-auto">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-10 h-10 bg-[#00693B] rounded-xl flex items-center justify-center shadow-sm">
+              <PackageSearch className="text-white" size={20} />
+            </div>
+            <h1 className="text-2xl md:text-3xl font-black text-gray-900 tracking-tight font-inter m-0">All Products</h1>
+          </div>
+          <p className="text-sm font-semibold text-gray-500 max-w-xl">Browse our full catalog of premium agricultural solutions, certified pesticides, and state-of-the-art sprayers.</p>
         </header>
 
         <main className="max-w-[1600px] mx-auto px-4 md:px-8 w-full flex-1">

@@ -97,21 +97,21 @@ const DoseCalculatorScreen = () => {
 
               {/* Results */}
               <div className="flex flex-col justify-center">
-                <div className="bg-[#FEB600] rounded-[28px] p-8 text-white shadow-xl shadow-gray-900/20 relative overflow-hidden">
+                <div className="bg-gradient-to-br from-[#00693B] to-[#004d2b] rounded-[28px] p-8 text-white shadow-xl shadow-emerald-950/20 relative overflow-hidden">
                   <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-5 rounded-bl-full pointer-events-none"></div>
                   
-                  <h3 className="text-sm font-bold text-[#333333] uppercase tracking-widest mb-6">Mix Required</h3>
+                  <h3 className="text-sm font-bold text-emerald-200 uppercase tracking-widest mb-6">Mix Required</h3>
                   
                   <div className="mb-8">
                     <div className="flex items-baseline gap-2">
-                      <span className="text-6xl font-extrabold tracking-tighter">{dosePerTank.toFixed(1)}</span>
-                      <span className="text-2xl font-semibold text-[#333333]">ml/g</span>
+                      <span className="text-6xl font-extrabold tracking-tighter text-white">{dosePerTank.toFixed(1)}</span>
+                      <span className="text-2xl font-semibold text-emerald-200">ml/g</span>
                     </div>
-                    <p className="text-sm font-medium text-[#333333] mt-2">per {tankSize}L spray tank</p>
+                    <p className="text-sm font-medium text-emerald-100 mt-2">per {tankSize}L spray tank</p>
                   </div>
 
-                  <div className="pt-6 border-t border-[#FEB600]/50">
-                    <p className="text-sm font-medium text-[#333333] flex items-center justify-between">
+                  <div className="pt-6 border-t border-emerald-500/30">
+                    <p className="text-sm font-medium text-emerald-100 flex items-center justify-between">
                       <span>Concentration:</span>
                       <span className="font-bold text-white">{dosePerLiter.toFixed(2)} ml/L</span>
                     </p>
