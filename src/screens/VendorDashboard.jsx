@@ -7,7 +7,7 @@ import {
   ArrowLeft, Plus, Pencil, Trash2, Package, Tag,
   CheckCircle2, ChevronDown, Store, X, AlertTriangle,
   FileText, Building2, User, Phone, MapPin, ShieldCheck,
-  ClipboardCheck, BadgeCheck, TrendingUp, ShoppingCart, Clock, PackageSearch
+  ClipboardCheck, BadgeCheck, TrendingUp, ShoppingCart, Clock, PackageSearch, ArrowUpRight
 } from 'lucide-react';
 import { AreaChart, Area, BarChart, Bar, Cell, LabelList, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
@@ -337,30 +337,43 @@ const VendorDashboard = () => {
               </div>
             </div>
 
-            {/* Today's Sales */}
+            {/* Right Column: Recent Sales */}
             <div className="lg:col-span-1 bg-white border border-gray-200/70 rounded-2xl p-5 flex flex-col gap-4">
-              <div className="flex items-center gap-2 mb-1">
-                <div className="w-[3px] h-4 bg-[#00693B] rounded-sm" />
-                <h2 className="text-sm font-black text-gray-800 font-inter m-0">Today's Sales</h2>
+              
+              <div className="flex justify-end">
+                <button 
+                  onClick={() => navigate('/transactions')}
+                  className="text-[12px] font-bold text-[#00693B] hover:text-[#004d2b] hover:underline transition-colors cursor-pointer bg-transparent border-none p-0 flex items-center gap-1"
+                >
+                  View All Transactions <ArrowUpRight size={14} />
+                </button>
               </div>
-              <div className="flex flex-col gap-4 mt-2">
-                {sales.slice(0, 4).map((sale, idx) => (
-                  <div key={idx} onClick={() => navigate(`/invoice/${sale.id}`)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-gray-50/80 cursor-pointer transition-colors group border border-transparent hover:border-gray-100">
-                    <div className="w-10 h-10 bg-emerald-50 rounded-full flex items-center justify-center shrink-0 border border-emerald-100 group-hover:bg-[#00693B] transition-colors">
-                      <TrendingUp size={16} className="text-[#00693B] group-hover:text-white" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs font-black text-gray-900 font-inter truncate m-0 group-hover:text-[#00693B] transition-colors">{sale.customerName}</p>
-                      <p className="text-[10px] font-semibold text-gray-500 m-0 truncate">{sale.items} · {new Date(sale.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-xs font-bold text-[#00693B] m-0">+₹ {sale.amount.toLocaleString('en-IN')}</p>
-                      <p className="text-[9px] font-bold text-gray-400 mt-0.5 uppercase tracking-widest">{sale.method}</p>
-                    </div>
-                  </div>
-                ))}
+
+              <div className="flex items-center justify-between mb-1">
+                <div className="flex items-center gap-2">
+                  <div className="w-[3px] h-4 bg-[#00693B] rounded-sm" />
+                  <h2 className="text-sm font-black text-gray-800 font-inter m-0">Recent Sales</h2>
+                </div>
               </div>
-            </div>
+              
+              <div className="flex flex-col gap-4">
+                  {sales.slice(0, 4).map((sale, idx) => (
+                    <div key={idx} onClick={() => navigate(`/invoice/${sale.id}`)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-gray-50/80 cursor-pointer transition-colors group border border-transparent hover:border-gray-100">
+                      <div className="w-10 h-10 bg-emerald-50 rounded-full flex items-center justify-center shrink-0 border border-emerald-100 group-hover:bg-[#00693B] transition-colors">
+                        <TrendingUp size={16} className="text-[#00693B] group-hover:text-white" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-black text-gray-900 font-inter truncate m-0 group-hover:text-[#00693B] transition-colors">{sale.customerName}</p>
+                        <p className="text-[10px] font-semibold text-gray-500 m-0 truncate">{sale.items} · {new Date(sale.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-xs font-bold text-[#00693B] m-0">+₹ {sale.amount.toLocaleString('en-IN')}</p>
+                        <p className="text-[9px] font-bold text-gray-400 mt-0.5 uppercase tracking-widest">{sale.method}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
 
             {/* Debtors List (Udhaar Khata) */}
             <div className="lg:col-span-3 bg-white border border-gray-200/70 rounded-2xl p-5 flex flex-col gap-4 overflow-hidden">

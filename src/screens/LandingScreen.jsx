@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ShieldCheck, Users, Smartphone, Store, ArrowRight, CheckCircle2, Phone, Mail } from 'lucide-react';
+import { ShieldCheck, Users, Smartphone, Store, ArrowRight, CheckCircle2, Phone, Mail, TrendingUp } from 'lucide-react';
 import logo from '../assets/logo.png';
+import dashboardMockup from '../assets/dashboard_mockup.png';
+import chartsMockup from '../assets/charts_mockup.png';
 
 const LandingScreen = () => {
   const navigate = useNavigate();
@@ -60,7 +62,7 @@ const LandingScreen = () => {
           </h1>
           
           <p className="text-base md:text-lg text-gray-500 max-w-2xl mx-auto mb-8 font-medium leading-relaxed">
-            Replace your physical ledger with a smart digital dashboard. Manage your daily sales, track product inventory, and handle customer Udhaar accounts all from one place.
+            Ditch the paper ledger. Manage sales, track inventory, and handle Udhaar accounts from one smart dashboard.
           </p>
           
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -88,124 +90,163 @@ const LandingScreen = () => {
       {/* 
         Features Grid removed to keep the landing page short and sweet.
       */}      {/* Pricing Section */}
-      <section className="pb-12 relative z-10">
+      <section className="py-20 relative z-10 bg-[#F8FAF9]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-          <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-            {/* Free Tier */}
-            <div className="bg-white p-6 rounded-2xl border border-gray-200 flex flex-col">
-              <h3 className="text-lg font-bold text-gray-900 mb-1">Basic Trial</h3>
-              <p className="text-xs text-gray-500 font-medium mb-4">Perfect to test the waters and see how our POS works for your store.</p>
-              <div className="mb-4">
-                <span className="text-3xl font-black text-gray-900">Free</span>
-                <span className="text-xs text-gray-500 font-medium"> / 6 months</span>
-              </div>
-              <ul className="space-y-2 mb-6 flex-1">
-                <li className="flex items-center gap-2 text-xs text-gray-700 font-medium"><CheckCircle2 size={14} className="text-[#00693B]" /> Full POS Access</li>
-                <li className="flex items-center gap-2 text-xs text-gray-700 font-medium"><CheckCircle2 size={14} className="text-[#00693B]" /> Basic Analytics</li>
-                <li className="flex items-center gap-2 text-xs text-gray-700 font-medium"><CheckCircle2 size={14} className="text-[#00693B]" /> Up to 50 Products</li>
+          <div className="grid lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+            
+            {/* Left side text details */}
+            <div className="lg:col-span-5 flex flex-col">
+              <h2 className="text-4xl md:text-5xl font-black text-gray-900 font-inter leading-tight mb-6">
+                Simple, transparent pricing
+              </h2>
+              <p className="text-lg text-gray-500 font-medium leading-relaxed mb-8">
+                Choose the plan that best fits your business needs. Upgrade anytime as your store grows. No hidden fees, no complicated contracts.
+              </p>
+              <ul className="space-y-4">
+                <li className="flex items-center gap-3 text-base font-bold text-gray-800">
+                  <CheckCircle2 size={20} className="text-[#00693B]" /> 14-day money-back guarantee
+                </li>
+                <li className="flex items-center gap-3 text-base font-bold text-gray-800">
+                  <CheckCircle2 size={20} className="text-[#00693B]" /> Cancel anytime online
+                </li>
+                <li className="flex items-center gap-3 text-base font-bold text-gray-800">
+                  <CheckCircle2 size={20} className="text-[#00693B]" /> Priority WhatsApp Support
+                </li>
               </ul>
-              <button onClick={() => navigate('/login', { state: { plan: 'Basic Trial', price: 0, duration: '6 months' } })} className="w-full py-2.5 bg-gray-50 border border-gray-200 text-gray-700 rounded-lg font-bold text-sm hover:bg-gray-100 transition-colors">Start Free Trial</button>
             </div>
 
-            {/* 1 Year Tier */}
-            <div className="bg-white p-6 rounded-2xl border-2 border-[#00693B] flex flex-col relative">
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#00693B] text-white text-[9px] font-bold uppercase tracking-widest py-1 px-3 rounded-full">
-                Most Popular
+            {/* Right side: Pricing Cards */}
+            <div className="lg:col-span-7 grid sm:grid-cols-2 gap-6 lg:gap-8">
+              
+              {/* Free Tier */}
+              <div className="bg-white p-8 rounded-3xl border border-gray-200 flex flex-col hover:shadow-xl transition-shadow h-full relative">
+                <h3 className="text-xl font-bold text-gray-900 mb-2">Basic Trial</h3>
+                <p className="text-sm text-gray-500 font-medium mb-6">Perfect to test the waters and see how our POS works for your store.</p>
+                <div className="mb-8">
+                  <span className="text-4xl font-black text-gray-900">Free</span>
+                  <span className="text-sm text-gray-500 font-medium ml-1">/ 6 months</span>
+                </div>
+                <ul className="space-y-3 mb-8 flex-1">
+                  <li className="flex items-center gap-3 text-sm text-gray-700 font-bold"><CheckCircle2 size={16} className="text-[#00693B]" /> Full POS Access</li>
+                  <li className="flex items-center gap-3 text-sm text-gray-700 font-bold"><CheckCircle2 size={16} className="text-[#00693B]" /> Unlimited Products</li>
+                  <li className="flex items-center gap-3 text-sm text-gray-700 font-bold"><CheckCircle2 size={16} className="text-[#00693B]" /> WhatsApp Reminders</li>
+                  <li className="flex items-center gap-3 text-sm text-gray-700 font-bold"><CheckCircle2 size={16} className="text-[#00693B]" /> Udhaar Khata</li>
+                </ul>
+                <button onClick={() => navigate('/login', { state: { plan: 'Basic Trial', price: 0, duration: '6 months' } })} className="w-full py-3 bg-gray-50 border border-gray-200 text-gray-700 rounded-xl font-bold text-sm hover:bg-gray-100 transition-colors mt-auto">Start Free Trial</button>
               </div>
-              <h3 className="text-lg font-bold text-gray-900 mb-1">Annual Pro</h3>
-              <p className="text-xs text-gray-500 font-medium mb-4">The ultimate package for serious retailers who want peace of mind.</p>
-              <div className="mb-4">
-                <span className="text-3xl font-black text-gray-900">₹99</span>
-                <span className="text-xs text-gray-500 font-medium"> / 1 year</span>
+
+              {/* 1 Year Tier */}
+              <div className="bg-white p-8 rounded-3xl border-2 border-[#00693B] flex flex-col relative shadow-2xl shadow-[#00693B]/10 hover:shadow-[#00693B]/20 transition-shadow transform md:-translate-y-4 h-full mt-6 sm:mt-0">
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#00693B] text-white text-[10px] font-black uppercase tracking-widest py-1.5 px-4 rounded-full shadow-md">
+                  Most Popular
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">Annual Pro</h3>
+                <p className="text-sm text-gray-500 font-medium mb-6">The ultimate package for serious retailers who want peace of mind.</p>
+                <div className="mb-8">
+                  <span className="text-4xl font-black text-gray-900">₹99</span>
+                  <span className="text-sm text-gray-500 font-medium ml-1">/ 1 year</span>
+                </div>
+                <ul className="space-y-3 mb-8 flex-1">
+                  <li className="flex items-center gap-3 text-sm text-gray-700 font-bold"><CheckCircle2 size={16} className="text-[#00693B]" /> Everything in Basic</li>
+                  <li className="flex items-center gap-3 text-sm text-gray-700 font-bold"><CheckCircle2 size={16} className="text-[#00693B]" /> Unlimited Products</li>
+                  <li className="flex items-center gap-3 text-sm text-gray-700 font-bold"><CheckCircle2 size={16} className="text-[#00693B]" /> WhatsApp Reminders</li>
+                  <li className="flex items-center gap-3 text-sm text-gray-700 font-bold"><CheckCircle2 size={16} className="text-[#00693B]" /> Udhaar Khata</li>
+                </ul>
+                <button onClick={() => {
+                  localStorage.setItem('token', 'dummy_token');
+                  localStorage.setItem('isDemo', 'false');
+                  navigate('/vendor');
+                }} className="w-full py-3 bg-[#00693B] text-white rounded-xl font-bold text-sm hover:bg-[#004d2b] transition-colors shadow-lg shadow-[#00693B]/30 mt-auto">Choose Annual</button>
               </div>
-              <ul className="space-y-2 mb-6 flex-1">
-                <li className="flex items-center gap-2 text-xs text-gray-700 font-medium"><CheckCircle2 size={14} className="text-[#00693B]" /> Everything in Basic</li>
-                <li className="flex items-center gap-2 text-xs text-gray-700 font-medium"><CheckCircle2 size={14} className="text-[#00693B]" /> Unlimited Products</li>
-                <li className="flex items-center gap-2 text-xs text-gray-700 font-medium"><CheckCircle2 size={14} className="text-[#00693B]" /> WhatsApp Reminders</li>
-                <li className="flex items-center gap-2 text-xs text-gray-700 font-medium"><CheckCircle2 size={14} className="text-[#00693B]" /> Udhaar Khata</li>
-              </ul>
-              <button onClick={() => {
-                localStorage.setItem('token', 'dummy_token');
-                localStorage.setItem('isDemo', 'false');
-                navigate('/vendor');
-              }} className="w-full py-2.5 bg-[#00693B] text-white rounded-lg font-bold text-sm hover:bg-[#004d2b] transition-colors">Choose Annual</button>
+
             </div>
-
           </div>
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-black text-gray-900 font-inter mb-4">Core Features</h2>
-            <p className="text-gray-500 font-medium max-w-2xl mx-auto">Everything you need to digitize your agri-input store.</p>
+      {/* Dynamic Features Showcase */}
+      <section className="py-24 bg-white relative overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          
+          <div className="text-center mb-20">
+            <h2 className="text-4xl md:text-5xl font-black text-gray-900 font-inter mb-6">Built for Modern Agri-Retail</h2>
+            <p className="text-lg text-gray-500 font-medium max-w-3xl mx-auto">Stop wasting time on paper ledgers. Our platform provides an intuitive dashboard and powerful analytics to manage your business efficiently.</p>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
-            {[
-              { icon: <Store size={24} />, title: "Lightning POS", desc: "Checkout customers in seconds with built-in product catalogs." },
-              { icon: <Users size={24} />, title: "Udhaar Khata", desc: "Manage credit effectively and view customer balance histories." },
-              { icon: <Smartphone size={24} />, title: "WhatsApp Reminders", desc: "Send automated payment reminders to debtors with one click." },
-              { icon: <ShieldCheck size={24} />, title: "Tally Invoices", desc: "Generate professional A4 tax invoices ready for GST filing." }
-            ].map((feature, idx) => (
-              <div key={idx} className="bg-gray-50 p-6 rounded-2xl border border-gray-100 flex flex-col items-center text-center hover:bg-emerald-50 transition-colors">
-                <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-[#00693B] shadow-sm mb-4">
-                  {feature.icon}
-                </div>
-                <h3 className="text-base font-bold text-gray-900 mb-2">{feature.title}</h3>
-                <p className="text-xs text-gray-500 font-medium">{feature.desc}</p>
+
+          {/* Block 1: Dashboard Image Left, Text Right */}
+          <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-20 mb-24">
+            <div className="w-full lg:w-1/2 rounded-3xl overflow-hidden shadow-2xl shadow-[#00693B]/10 border border-gray-100 group relative">
+               <img src={dashboardMockup} alt="Vendor Dashboard Mockup" className="w-full h-auto object-cover transform group-hover:scale-[1.02] transition-transform duration-700" />
+            </div>
+            
+            <div className="w-full lg:w-1/2 flex flex-col gap-6">
+              <div className="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center text-[#00693B] mb-2 shadow-sm border border-emerald-100">
+                <Store size={28} />
               </div>
-            ))}
+              <h3 className="text-3xl font-black text-gray-900 font-inter">Complete Store Control</h3>
+              <p className="text-lg text-gray-500 font-medium leading-relaxed">
+                Experience a centralized dashboard where you can process sales instantly, track low-stock inventory, and monitor your Udhaar Khata. It's clean, lightning-fast, and designed specifically for pesticide and fertilizer retailers.
+              </p>
+              <ul className="space-y-4 mt-2">
+                {['Instant POS Checkout', 'Automated Udhaar Tracking', 'WhatsApp Integration'].map((item, i) => (
+                  <li key={i} className="flex items-center gap-3 text-base font-bold text-gray-800">
+                    <CheckCircle2 size={20} className="text-[#00693B]" /> {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
+
+          {/* Block 2: Text Left, Charts Image Right */}
+          <div className="flex flex-col lg:flex-row-reverse items-center gap-12 lg:gap-20">
+            <div className="w-full lg:w-1/2 rounded-3xl overflow-hidden shadow-2xl shadow-amber-500/10 border border-gray-100 group relative">
+               <img src={chartsMockup} alt="Analytics Charts Mockup" className="w-full h-auto object-cover transform group-hover:scale-[1.02] transition-transform duration-700" />
+            </div>
+            
+            <div className="w-full lg:w-1/2 flex flex-col gap-6">
+              <div className="w-14 h-14 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-600 mb-2 shadow-sm border border-amber-100">
+                <TrendingUp size={28} />
+              </div>
+              <h3 className="text-3xl font-black text-gray-900 font-inter">Yearly & Monthly Tracking</h3>
+              <p className="text-lg text-gray-500 font-medium leading-relaxed">
+                Never guess your profits again. Visualize your revenue growth and identify your top-selling products through beautifully designed interactive charts that track every transaction month-over-month.
+              </p>
+              <ul className="space-y-4 mt-2">
+                {['Visual Revenue Trends', 'Top Selling Products Analytics', 'Detailed Exportable Reports'].map((item, i) => (
+                  <li key={i} className="flex items-center gap-3 text-base font-bold text-gray-800">
+                    <CheckCircle2 size={20} className="text-amber-500" /> {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
         </div>
       </section>
 
-      {/* Benefits Section */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-black text-gray-900 font-inter mb-4">Why Choose PesticideIndia?</h2>
-          </div>
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {[
-              { title: "Save 2 Hours Daily", desc: "Automate your daily accounting, avoid manual calculation errors, and spend more time growing your business." },
-              { title: "Zero Udhaar Loss", desc: "Never forget a pending payment again. Real-time tracking ensures every rupee is accounted for." },
-              { title: "Look Professional", desc: "Impress your farmers with clean, printed invoices and instant WhatsApp digital receipts." }
-            ].map((benefit, idx) => (
-              <div key={idx} className="flex flex-col items-center text-center">
-                <div className="w-10 h-10 bg-[#00693B]/10 rounded-full flex items-center justify-center text-[#00693B] mb-4">
-                  <span className="font-black">{idx + 1}</span>
-                </div>
-                <h3 className="text-lg font-bold text-gray-900 mb-2">{benefit.title}</h3>
-                <p className="text-sm text-gray-500 font-medium leading-relaxed">{benefit.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+
 
       {/* Contact Section */}
-      <section className="py-20">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-black text-gray-900 font-inter mb-4">Get In Touch</h2>
-          <p className="text-gray-500 font-medium mb-10">Have questions or need support? We're here to help you grow.</p>
-          <div className="flex flex-col md:flex-row gap-6 justify-center">
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex-1 flex flex-col items-center hover:shadow-md transition-shadow">
-              <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center text-[#00693B] mb-4">
-                <Phone size={24} />
+      <section className="py-24 bg-[#F8FAF9] border-t border-gray-200/60">
+        <div className="max-w-3xl mx-auto px-4 text-center">
+          <h2 className="text-3xl font-black text-gray-900 font-inter mb-4">Need Help Getting Started?</h2>
+          <p className="text-gray-500 font-medium mb-8 text-lg">Our team is always available to answer your questions.</p>
+          
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-8 sm:gap-12">
+            <a href="tel:+919876543210" className="flex items-center gap-3 text-gray-700 hover:text-[#00693B] transition-colors font-bold text-base group cursor-pointer">
+              <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm border border-gray-200 group-hover:border-[#00693B] transition-colors">
+                <Phone size={18} className="text-[#00693B]" />
               </div>
-              <h3 className="font-bold text-gray-900">Call Us</h3>
-              <p className="text-sm text-gray-500 mt-1">+91 98765 43210</p>
-            </div>
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex-1 flex flex-col items-center hover:shadow-md transition-shadow">
-              <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center text-[#00693B] mb-4">
-                <Mail size={24} />
+              +91 98765 43210
+            </a>
+            
+            <a href="mailto:support@pesticideindia.com" className="flex items-center gap-3 text-gray-700 hover:text-[#00693B] transition-colors font-bold text-base group cursor-pointer">
+              <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm border border-gray-200 group-hover:border-[#00693B] transition-colors">
+                <Mail size={18} className="text-[#00693B]" />
               </div>
-              <h3 className="font-bold text-gray-900">Email Support</h3>
-              <p className="text-sm text-gray-500 mt-1">support@pesticideindia.com</p>
-            </div>
+              support@pesticideindia.com
+            </a>
           </div>
         </div>
       </section>

@@ -1,0 +1,17 @@
+export const ENDPOINTS = {
+  VENDOR_PRODUCTS: "/vendor/products/",
+  CUSTOMER_SIGNUP: "/vendor/customer-signup/",
+  SEARCH_CUSTOMER: "/vendor/search-customer/",
+  VENDOR_ORDERS: "/vendor/orders/",
+  CATALOG: "/vendor/products-catalog/",
+  COMBOS: "/vendor/combos/",
+  STAGES: "/vendor/stages/",
+  TOP_SELLING_PRODUCTS: "/vendor/top-selling-products/",
+  DEBTORS: "/vendor/debtors/",
+  SALES_SUMMARY: "/vendor/sales-summary/",
+  CUSTOM_SALES_SUMMARY: "/sales-summary/",
+  MONTHLY_EARNINGS: "/vendor/monthly-earnings/",
+  PAY_DEBT: "/vendor/pay-debt/",
+  TRANSACTIONS: "/vendor/transactions/",
+  ORDER_PDF: (orderId) => `/vendor/orders/${orderId}/pdf/`,
+};

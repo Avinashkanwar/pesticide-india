@@ -145,7 +145,10 @@ const SaleNowScreen = () => {
         {/* Left Side: Product Selection */}
         <div className="w-full md:w-3/5 flex flex-col border-r border-gray-200 h-full overflow-hidden bg-white">
           <div className="p-5 border-b border-gray-100">
-            <h2 className="text-lg font-black text-gray-900 font-inter mb-4">Select Products</h2>
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-[3px] h-5 bg-amber-500 rounded-sm" />
+              <h2 className="text-lg font-black text-gray-900 font-inter m-0">Select Products</h2>
+            </div>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
               <input 

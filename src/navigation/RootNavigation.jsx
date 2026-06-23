@@ -11,6 +11,7 @@ import PaymentScreen from '../screens/PaymentScreen';
 import OrderConfirmScreen from '../screens/OrderConfirmScreen';
 import InvoiceScreen from '../screens/InvoiceScreen';
 import VendorDashboard from '../screens/VendorDashboard';
+import TransactionsScreen from '../screens/TransactionsScreen';
 import PlanCheckoutScreen from '../screens/PlanCheckoutScreen';
 import PlanSuccessScreen from '../screens/PlanSuccessScreen';
 import DealerSetupScreen from '../screens/DealerSetupScreen';
@@ -106,6 +107,14 @@ const RootNavigation = () => {
           element={
             <PrivateRoute>
               <VendorDashboard />
+            </PrivateRoute>
+          } 
+        />
+        <Route 
+          path="/transactions" 
+          element={
+            <PrivateRoute>
+              <TransactionsScreen />
             </PrivateRoute>
           } 
         />
