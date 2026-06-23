@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import DesktopSidebar from '../components/DesktopSidebar';
 import MobileBottomNav from '../components/MobileBottomNav';
-import Header from '../components/Header';
+
 import { ShoppingCart, Star, Plus, PackageSearch } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
 import { Lock } from 'lucide-react';
@@ -126,10 +126,10 @@ const ProductScreen = () => {
 
   if (isDemo) {
     return (
-      <div className="min-h-screen font-outfit flex overflow-hidden bg-gray-50">
+      <div className="min-h-screen font-outfit flex overflow-hidden bg-transparent">
         <DesktopSidebar />
         <div className="flex-1 ml-0 md:ml-24 flex flex-col min-w-0 h-screen overflow-y-auto pb-20 md:pb-10">
-          <Header />
+
           <div className="flex-1 flex flex-col items-center justify-center p-8 text-center animate-fade-in-up">
             <div className="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mb-6">
               <span className="text-4xl">🔒</span>
@@ -145,11 +145,11 @@ const ProductScreen = () => {
   }
 
   return (
-    <div className="min-h-screen font-outfit flex overflow-hidden bg-gray-50/50">
+    <div className="min-h-screen font-outfit flex overflow-hidden bg-transparent">
       <DesktopSidebar />
       
       <div className="flex-1 ml-0 md:ml-24 flex flex-col min-w-0 h-screen overflow-y-auto pb-20 md:pb-10">
-        <Header />
+
         <header className="pt-8 pb-6 px-4 md:px-8 max-w-[1600px] w-full mx-auto">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-10 h-10 bg-[#00693B] rounded-xl flex items-center justify-center shadow-sm">

@@ -35,7 +35,7 @@ const InvoiceScreen = () => {
 
   if (!sale) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 font-outfit">
+      <div className="min-h-screen flex items-center justify-center bg-transparent font-outfit">
         <p className="text-gray-500 font-semibold">Loading or Invoice not found...</p>
       </div>
     );
@@ -71,7 +71,7 @@ const InvoiceScreen = () => {
   }
 
   return (
-    <div className="min-h-screen font-sans bg-gray-100/50 pb-10">
+    <div className="min-h-screen font-sans bg-transparent pb-10">
       <header className="px-5 py-4 flex items-center justify-between sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm print:hidden">
         <div className="flex items-center gap-3">
           <button

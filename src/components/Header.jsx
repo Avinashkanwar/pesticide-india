@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ShoppingCart, AlertTriangle, Leaf } from 'lucide-react';
 import { getCartCount } from '../utils/cartHelper';
+import logo from '../assets/logo.png';
 
 const Header = () => {
   const navigate = useNavigate();
@@ -13,7 +14,7 @@ const Header = () => {
     <>
       <header className="px-6 md:px-10 py-4 flex items-center justify-between gap-4 sticky top-0 z-[60] bg-white/90 backdrop-blur-xl border-b border-gray-100">
         <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate('/')}>
-          <div className="w-10 h-10 bg-[#00693B] rounded-xl flex items-center justify-center text-white font-black text-lg font-inter tracking-tighter">PI</div>
+          <img src={logo} alt="Pesticide India Logo" className="w-12 h-12 object-contain" />
           <div>
             <h1 className="text-xl font-black text-[#111827] m-0 leading-[1.1] font-inter tracking-tight">
               Pesticide<span className="text-[#00693B]">India</span>

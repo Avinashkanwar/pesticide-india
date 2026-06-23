@@ -21,7 +21,7 @@ const LoginScreen = () => {
   };
 
   return (
-    <div className="min-h-screen font-sans flex flex-col justify-center py-12 sm:px-6 lg:px-8 bg-gray-50">
+    <div className="min-h-screen font-sans flex flex-col justify-center py-12 sm:px-6 lg:px-8 bg-transparent">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="flex justify-center">
           <div className="w-16 h-16 bg-[#00693B] rounded-2xl shadow-lg shadow-[#00693B]/20 flex items-center justify-center">

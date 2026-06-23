@@ -31,7 +31,7 @@ const PlanSuccessScreen = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 font-outfit py-12 px-4 flex flex-col items-center justify-center">
+    <div className="min-h-screen bg-transparent font-outfit py-12 px-4 flex flex-col items-center justify-center">
       <div className="max-w-md w-full bg-white rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100 p-8 text-center animate-fade-in-up">
         
         <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6">

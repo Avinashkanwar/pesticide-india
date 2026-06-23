@@ -18,7 +18,7 @@ const OrderConfirmScreen = () => {
   }[paymentMethod] || '💳';
 
   return (
-    <div className="min-h-screen font-outfit bg-gray-50/50">
+    <div className="min-h-screen font-outfit bg-transparent">
       <header className="px-5 py-4 flex items-center gap-3 sticky top-0 z-50 bg-white border-b border-gray-100">
         <div className="w-8 h-8 bg-[#00693B] rounded-xl flex items-center justify-center text-white font-black text-sm font-inter">PI</div>
         <div>

@@ -31,7 +31,7 @@ const DealerSetupScreen = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 font-outfit py-12 px-4 sm:px-6 lg:px-8 flex flex-col items-center">
+    <div className="min-h-screen bg-transparent font-outfit py-12 px-4 sm:px-6 lg:px-8 flex flex-col items-center">
       <div className="max-w-2xl w-full">
         <div className="text-center mb-10">
           <div className="w-16 h-16 bg-[#00693B] rounded-2xl flex items-center justify-center shadow-lg shadow-[#00693B]/20 mx-auto mb-6">

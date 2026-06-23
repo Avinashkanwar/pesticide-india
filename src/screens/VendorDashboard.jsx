@@ -9,16 +9,9 @@ import {
   FileText, Building2, User, Phone, MapPin, ShieldCheck,
   ClipboardCheck, BadgeCheck, TrendingUp, ShoppingCart, Clock, PackageSearch
 } from 'lucide-react';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { AreaChart, Area, BarChart, Bar, Cell, LabelList, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
-const MONTHLY_SALES_DATA = [
-  { name: 'Jan', sales: 65000 },
-  { name: 'Feb', sales: 72000 },
-  { name: 'Mar', sales: 85000 },
-  { name: 'Apr', sales: 110000 },
-  { name: 'May', sales: 125600 },
-  { name: 'Jun', sales: 145000 },
-];
+
 
 const CATEGORIES = ['Pesticides', 'Fertilizers', 'Sprayers', 'Nets', 'Others'];
 const STOCK_OPTIONS = ['In Stock', 'Low Stock', 'Out of Stock'];
@@ -94,11 +87,29 @@ const VendorDashboard = () => {
   const [sales, setSales] = useState(() => {
     try { 
       const existing = localStorage.getItem('vendor_sales');
-      if (existing) return JSON.parse(existing);
-      const mockSales = [
-        { id: 's_1', customerName: 'Amit Patel', items: 'Nativo 75 WG', date: new Date().toISOString(), amount: 3150, method: 'Online' },
-        { id: 's_2', customerName: 'Rajesh Kumar', items: 'Coragen', date: new Date().toISOString(), amount: 3830, method: 'Cash' },
-      ];
+      if (existing) {
+        const parsed = JSON.parse(existing);
+        // Use existing if it already has the 4 years of data (around 96 items)
+        if (parsed.length > 90) return parsed;
+      }
+
+      const mockSales = [];
+      const currDate = new Date();
+      
+      // Generate 4 years of data (48 months) to fully test the charts
+      for (let i = 0; i < 48; i++) {
+        const monthsAgo = 47 - i;
+        const d = new Date(currDate.getFullYear(), currDate.getMonth() - monthsAgo, 15);
+        
+        // Create a trend that generally goes upward, with some random spikes
+        const baseTrend = 8000 + (i * 1200); 
+        const randomFactor = 0.7 + (Math.random() * 0.6); // Random between 0.7 and 1.3
+        const monthlyTotal = baseTrend * randomFactor;
+        
+        mockSales.push({ id: `s_m1_${i}`, customerName: 'Ramesh Singh', items: 'Nativo 75 WG', date: d.toISOString(), amount: Math.floor(monthlyTotal * 0.4), method: 'Cash' });
+        mockSales.push({ id: `s_m2_${i}`, customerName: 'Kisan Patel', items: 'Coragen, Urea', date: new Date(d.getTime() + 86400000).toISOString(), amount: Math.floor(monthlyTotal * 0.6), method: 'Online' });
+      }
+
       localStorage.setItem('vendor_sales', JSON.stringify(mockSales));
       return mockSales;
     } catch { return []; }
@@ -173,6 +184,46 @@ const VendorDashboard = () => {
   const inStockCount = products.filter(p => p.stock === 'In Stock').length;
   const lowStockCount = products.filter(p => p.stock === 'Low Stock').length;
 
+  // Dynamic Chart & Sales Calculation
+  const currentYear = new Date().getFullYear();
+  const lastYear = currentYear - 1;
+  let currentYearTotal = 0;
+  let lastYearTotal = 0;
+  let hasLastYearData = false;
+  const monthlyDataMap = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0 };
+
+  sales.forEach(sale => {
+    const d = new Date(sale.date);
+    const year = d.getFullYear();
+    if (year === currentYear) {
+      currentYearTotal += sale.amount;
+      monthlyDataMap[d.getMonth()] += sale.amount;
+    } else if (year === lastYear) {
+      lastYearTotal += sale.amount;
+      hasLastYearData = true;
+    }
+  });
+
+  const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const dynamicSalesData = monthNames.map((name, index) => ({
+    name,
+    sales: monthlyDataMap[index]
+  }));
+
+  const yearlyDataMap = {};
+  sales.forEach(sale => {
+    const d = new Date(sale.date);
+    const year = d.getFullYear();
+    if (!yearlyDataMap[year]) yearlyDataMap[year] = 0;
+    yearlyDataMap[year] += sale.amount;
+  });
+  const yearlySalesData = Object.keys(yearlyDataMap).sort().map(year => {
+    return {
+      name: year,
+      total: yearlyDataMap[year]
+    };
+  });
+
   // ── DASHBOARD SCREEN ─────────────────────────────
   return (
     <div className="min-h-screen font-outfit flex overflow-hidden" style={{ background: 'transparent' }}>
@@ -203,13 +254,7 @@ const VendorDashboard = () => {
             </div>
           )}
 
-          {/* Top Actions */}
-          <div className="flex justify-end gap-3 w-full mb-[-10px] z-10 relative">
-            <button onClick={() => navigate('/sale-now')}
-              className="flex items-center gap-1.5 px-4 py-1.5 bg-amber-500 text-white rounded-lg text-[11px] font-bold hover:bg-amber-600 transition-all cursor-pointer shadow-sm">
-              <ShoppingCart size={14} strokeWidth={3} /> Sale Now
-            </button>
-          </div>
+
 
           {/* Success Banner */}
           {successMsg && (
@@ -223,9 +268,7 @@ const VendorDashboard = () => {
             {[
               { label: 'Monthly Revenue', value: '₹ ' + (sales.reduce((sum, s) => sum + s.amount, 0)/1000).toFixed(1) + 'k', sub: 'Calculated from sales', icon: <TrendingUp size={16} />, color: 'text-emerald-600 bg-emerald-50 border-emerald-200' },
               { label: 'Total Debtors', value: customers.filter(c => c.udhaarBalance > 0).length, sub: 'Active accounts', icon: <User size={16} />, color: 'text-blue-600 bg-blue-50 border-blue-200' },
-              { label: 'Outstanding Amount', value: '₹ ' + customers.reduce((sum, c) => sum + (c.udhaarBalance || 0), 0).toLocaleString('en-IN'), sub: 'Across ' + customers.filter(c => c.udhaarBalance > 0).length + ' debtors', icon: <FileText size={16} />, color: 'text-amber-600 bg-amber-50 border-amber-200' },
               { label: 'Total Products', value: 10 + products.length, sub: `${10 + inStockCount} in stock`, icon: <Package size={16} />, color: 'text-[#00693B] bg-[#F5F7E9] border-[#00693B]/30' },
-
             ].map((s, i) => (
               <div key={i} className="bg-white border border-gray-200/80 rounded-xl p-3 flex flex-col gap-1.5 relative overflow-hidden group hover:border-[#00693B]/40 hover:shadow-sm transition-all cursor-default">
                 <div className={`w-8 h-8 rounded-lg flex items-center justify-center border ${s.color} mb-0.5 shadow-sm`}>{s.icon}</div>
@@ -239,6 +282,17 @@ const VendorDashboard = () => {
                 </div>
               </div>
             ))}
+
+            <div 
+              onClick={() => navigate('/sale-now')}
+              className="bg-white border border-gray-200/80 rounded-xl p-3 flex flex-col items-center justify-center gap-1.5 relative overflow-hidden group hover:border-amber-500/40 hover:shadow-sm transition-all cursor-pointer shadow-sm"
+            >
+              <ShoppingCart size={32} strokeWidth={2.5} className="text-amber-500 mb-0.5 relative z-10" />
+              <p className="text-[14px] font-black text-amber-500 font-inter m-0 relative z-10 uppercase tracking-widest">Sale Now</p>
+              <div className="absolute -right-2 -bottom-2 opacity-[0.05] transition-transform duration-500 group-hover:scale-125 group-hover:-rotate-12 text-amber-500">
+                <ShoppingCart size={80} />
+              </div>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -249,13 +303,20 @@ const VendorDashboard = () => {
                   <div className="w-[3px] h-4 bg-[#00693B] rounded-sm" />
                   <h2 className="text-sm font-black text-gray-800 font-inter m-0">Monthly Earnings Overview</h2>
                 </div>
-                <div className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-1 rounded-lg border border-emerald-100">
-                  +15.4% this month
+                <div className="flex gap-2">
+                  {hasLastYearData && (
+                    <div className="text-[10px] font-bold text-gray-500 bg-gray-50 px-2 py-1 rounded-lg border border-gray-200">
+                      Last Year: ₹{lastYearTotal.toLocaleString('en-IN')}
+                    </div>
+                  )}
+                  <div className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-1 rounded-lg border border-emerald-100">
+                    This Year: ₹{currentYearTotal.toLocaleString('en-IN')}
+                  </div>
                 </div>
               </div>
               <div className="h-[250px] w-full mt-2">
                 <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={MONTHLY_SALES_DATA} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <AreaChart data={dynamicSalesData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                     <defs>
                       <linearGradient id="colorSales" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="5%" stopColor="#00693B" stopOpacity={0.2}/>
@@ -351,46 +412,39 @@ const VendorDashboard = () => {
             </div>
           </div>
 
-          {/* New Row for Low Stock Alerts */}
+          {/* New Row for All Sales Chart */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-3 bg-white border border-gray-200/70 rounded-2xl p-5 flex flex-col gap-4 overflow-hidden">
               <div className="flex items-center justify-between mb-1">
                 <div className="flex items-center gap-2">
                   <div className="w-[3px] h-4 bg-amber-500 rounded-sm" />
-                  <h2 className="text-sm font-black text-gray-800 font-inter m-0">Low Stock Alerts</h2>
+                  <h2 className="text-sm font-black text-gray-800 font-inter m-0">Yearly Earnings Overview</h2>
                 </div>
               </div>
-              <div className="overflow-x-auto -mx-2 px-2">
-                <table className="w-full text-left border-collapse min-w-[600px]">
-                  <thead>
-                    <tr className="border-b border-gray-100">
-                      <th className="pb-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest whitespace-nowrap">Product Name</th>
-                      <th className="pb-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest whitespace-nowrap">Category</th>
-                      <th className="pb-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest whitespace-nowrap">Status</th>
-                      <th className="pb-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest text-right whitespace-nowrap">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {products.filter(p => p.stock === 'Low Stock' || p.stock === 'Out of Stock').length === 0 ? (
-                      <tr><td colSpan="4" className="py-4 text-center text-xs text-gray-400 font-medium">All products are adequately stocked.</td></tr>
-                    ) : products.filter(p => p.stock === 'Low Stock' || p.stock === 'Out of Stock').map((p, idx) => (
-                      <tr key={idx} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors">
-                        <td className="py-3 text-xs font-bold text-gray-900 whitespace-nowrap">{p.name}</td>
-                        <td className="py-3 text-xs font-semibold text-gray-600 whitespace-nowrap">{p.category}</td>
-                        <td className="py-3 whitespace-nowrap">
-                          <span className={`text-[9px] font-bold px-2 py-0.5 rounded-md border ${p.stock === 'Low Stock' ? 'bg-amber-50 text-amber-600 border-amber-200' : 'bg-red-50 text-red-600 border-red-200'}`}>
-                            {p.stock}
-                          </span>
-                        </td>
-                        <td className="py-3 text-right whitespace-nowrap">
-                          <button onClick={() => handleEdit(p)} className="inline-flex items-center gap-1 text-[10px] font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-lg cursor-pointer transition-colors border-none shadow-sm">
-                            <Pencil size={12} /> Update Stock
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+              <div className="h-[250px] w-full mt-2">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={yearlySalesData} margin={{ top: 30, right: 10, left: -20, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F3F4F6" opacity={0.6} />
+                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 13, fill: '#6B7280', fontWeight: 500 }} dy={10} />
+                    <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#6B7280', fontWeight: 500 }} tickFormatter={(val) => `₹${val/1000}k`} />
+                    <Tooltip 
+                      cursor={{ fill: 'rgba(0, 105, 59, 0.05)' }}
+                      contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1)', padding: '12px 16px' }}
+                      itemStyle={{ color: '#111827', fontWeight: 700, fontSize: '15px' }}
+                      labelStyle={{ display: 'none' }}
+                      formatter={(value) => [`₹ ${value.toLocaleString('en-IN')}`, 'Revenue']}
+                    />
+                    <Bar dataKey="total" radius={[6, 6, 0, 0]} barSize={36} animationDuration={1000}>
+                      <LabelList dataKey="total" position="top" formatter={(val) => `₹${(val/1000).toFixed(0)}k`} style={{ fill: '#6B7280', fontSize: 12, fontWeight: 500 }} dy={-8} />
+                      {yearlySalesData.map((entry, index) => {
+                        let color = "#FEB600";
+                        if (entry.total >= 300000) color = "#3B82F6";
+                        else if (entry.total >= 150000) color = "#00693B";
+                        return <Cell key={`cell-${index}`} fill={color} />;
+                      })}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
               </div>
             </div>
           </div>

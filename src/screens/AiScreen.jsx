@@ -18,7 +18,8 @@ import {
   Sparkles,
   ChevronRight,
   ShoppingCart,
-  Store
+  Store,
+  Clock
 } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
 import { getCartCount } from '../utils/cartHelper';
@@ -163,10 +164,9 @@ const HomeScreen = () => {
 
   if (isDemo) {
     return (
-      <div className="min-h-screen font-outfit flex overflow-hidden bg-gray-50">
+      <div className="min-h-screen font-outfit flex overflow-hidden bg-transparent">
         <DesktopSidebar />
         <div className="flex-1 ml-0 md:ml-24 flex flex-col min-w-0 h-screen overflow-y-auto pb-20 md:pb-10">
-          <Header />
           <div className="flex-1 flex flex-col items-center justify-center p-8 text-center animate-fade-in-up">
             <div className="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mb-6">
               <span className="text-4xl">🔒</span>
@@ -185,6 +185,24 @@ const HomeScreen = () => {
   const [aiAge, setAiAge] = useState('');
   const [aiDisease, setAiDisease] = useState('');
   const [aiStatus, setAiStatus] = useState('idle');
+  const [chatInput, setChatInput] = useState('');
+  const [chatMessages, setChatMessages] = useState([]);
+  const [isTyping, setIsTyping] = useState(false);
+
+  const handleSendMessage = () => {
+    if (!chatInput.trim()) return;
+    setChatMessages(prev => [...prev, { role: 'user', text: chatInput }]);
+    setChatInput('');
+    setIsTyping(true);
+    if (aiStatus === 'idle') setAiStatus('chatting');
+    setTimeout(() => {
+      setIsTyping(false);
+      setChatMessages(prev => [...prev, {
+        role: 'ai',
+        text: 'I understand. Please ensure you monitor the soil moisture regularly. Applying a light dose of water-soluble NPK can help boost recovery. Let me know if you see any further symptoms!'
+      }]);
+    }, 1500);
+  };
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('All');
   const [activeTip, setActiveTip] = useState(0);
@@ -215,9 +233,9 @@ const HomeScreen = () => {
       aiAssistant: "AI Crop Assistant",
       precisionFarming: "Powered by Precision Farming",
       aiDesc: "Select your crop, its growth stage, and the issue you see to get an instant precision solution.",
-      selectCrop: "Select Crop (फसल चुनें)",
-      cropStage: "Crop Stage (अवस्था चुनें)",
-      observedIssue: "Observed Issue (समस्या चुनें)",
+      selectCrop: "Select Crop",
+      cropStage: "Crop Stage",
+      observedIssue: "Observed Issue",
       analyze: "Analyze with AI",
       analyzing: "Analyzing data...",
       crossRef: "Cross-referencing with local conditions",
@@ -335,20 +353,16 @@ const HomeScreen = () => {
     <div className="min-h-screen flex bg-transparent font-outfit overflow-hidden">
       <DesktopSidebar />
 
-      <div className="flex-1 ml-0 md:ml-24 flex flex-col min-w-0 h-screen overflow-y-auto pb-16 md:pb-0">
-
-        <Header />
-
-
+      <div className="flex-1 ml-0 md:ml-24 flex flex-col min-w-0 h-screen overflow-hidden pb-16 md:pb-0">
 
         {/* ── MAIN GRID ── */}
-        <main className="flex-1 px-4 md:px-7 pt-6 md:pt-8 flex flex-col items-center pb-6">
+        <main className="flex-1 px-4 md:px-7 pt-6 md:pt-8 flex flex-col items-center pb-6 overflow-hidden">
 
           {/* AI and Tips Panels */}
-          <div className="w-full max-w-[1200px] flex flex-col lg:flex-row gap-6 pb-8">
+          <div className="w-full max-w-[1200px] flex flex-col lg:flex-row gap-6 pb-8 h-full">
             
             {/* LEFT COLUMN: Input Form & Tips */}
-            <div className="w-full lg:w-[350px] flex flex-col gap-5 shrink-0 lg:sticky lg:top-8 h-max">
+            <div className="w-full lg:w-[350px] flex flex-col gap-5 shrink-0 h-full overflow-y-auto custom-scrollbar pr-1 pb-4">
 
             {/* AI Crop Assistant */}
             <div className="glass-panel rounded-xl p-4">
@@ -367,7 +381,6 @@ const HomeScreen = () => {
 
               <div className="h-[1px] bg-gray-100 my-3.5"></div>
 
-              {aiStatus === 'idle' && (
                 <div className="flex flex-col gap-3">
                   <p className="text-[12px] text-gray-600 m-0 leading-snug">
                     {t.aiDesc}
@@ -376,44 +389,44 @@ const HomeScreen = () => {
                   <div className="flex flex-col gap-1.5">
                     <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">{t.selectCrop}</label>
                     <select value={aiCrop} onChange={e => setAiCrop(e.target.value)} className="w-full py-2 px-3 bg-gray-50 border border-gray-200 rounded-lg text-[12px] text-gray-900 font-semibold outline-none transition-colors duration-200 appearance-none font-outfit focus:border-[#00693B]">
-                      <option value="">-- फसल चुनें --</option>
-                      <option value="गेहूँ (Wheat)">गेहूँ (Wheat)</option>
-                      <option value="धान (Rice)">धान (Rice)</option>
-                      <option value="कपास (Cotton)">कपास (Cotton)</option>
-                      <option value="गन्ना (Sugarcane)">गन्ना (Sugarcane)</option>
-                      <option value="टमाटर (Tomato)">टमाटर (Tomato)</option>
+                      <option value="">-- Select Crop --</option>
+                      <option value="Wheat">Wheat</option>
+                      <option value="Rice">Rice</option>
+                      <option value="Cotton">Cotton</option>
+                      <option value="Sugarcane">Sugarcane</option>
+                      <option value="Tomato">Tomato</option>
                     </select>
                   </div>
 
                   <div className="flex flex-col gap-1.5">
                     <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">{t.cropStage}</label>
                     <select value={aiAge} onChange={e => setAiAge(e.target.value)} className="w-full py-2 px-3 bg-gray-50 border border-gray-200 rounded-lg text-[12px] text-gray-900 font-semibold outline-none transition-colors duration-200 appearance-none font-outfit focus:border-[#00693B]">
-                      <option value="">-- अवस्था चुनें --</option>
-                      <option value="पौध (Seedling)">पौध (Seedling)</option>
-                      <option value="वानस्पतिक विकास (Vegetative)">वानस्पतिक विकास (Vegetative)</option>
-                      <option value="फूल आना (Flowering)">फूल आना (Flowering)</option>
-                      <option value="फल लगना (Fruiting)">फल लगना (Fruiting)</option>
-                      <option value="परिपक्व (Mature)">परिपक्व (Mature)</option>
+                      <option value="">-- Select Stage --</option>
+                      <option value="Seedling">Seedling</option>
+                      <option value="Vegetative">Vegetative</option>
+                      <option value="Flowering">Flowering</option>
+                      <option value="Fruiting">Fruiting</option>
+                      <option value="Mature">Mature</option>
                     </select>
                   </div>
 
                   <div className="flex flex-col gap-1.5">
                     <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">{t.observedIssue}</label>
                     <select value={aiDisease} onChange={e => setAiDisease(e.target.value)} className="w-full py-2 px-3 bg-gray-50 border border-gray-200 rounded-lg text-[12px] text-gray-900 font-semibold outline-none transition-colors duration-200 appearance-none font-outfit focus:border-[#00693B]">
-                      <option value="">-- समस्या चुनें --</option>
-                      <option value="सफेद मक्खी (Whitefly)">सफेद मक्खी (Whitefly)</option>
-                      <option value="माहू (Aphids)">माहू (Aphids)</option>
-                      <option value="झुलसा रोग (Leaf Blight)">झुलसा रोग (Leaf Blight)</option>
-                      <option value="पत्तियों का पीला पड़ना">पत्तियों का पीला पड़ना (Yellowing)</option>
-                      <option value="फल छेदक कीट (Fruit Borer)">फल छेदक कीट (Fruit Borer)</option>
+                      <option value="">-- Select Issue --</option>
+                      <option value="Whitefly">Whitefly</option>
+                      <option value="Aphids">Aphids</option>
+                      <option value="Leaf Blight">Leaf Blight</option>
+                      <option value="Yellowing">Yellowing</option>
+                      <option value="Fruit Borer">Fruit Borer</option>
                     </select>
                   </div>
 
                   <button 
                     className={`w-full py-3 bg-[#FEB600] text-[#1a1a1a] border-none rounded-lg text-[12px] font-bold flex items-center justify-center gap-1.5 transition-all duration-200 mt-1 font-outfit ${
-                      (aiCrop && aiAge && aiDisease) ? 'opacity-100 cursor-pointer hover:bg-[#e6a400]' : 'opacity-50 cursor-not-allowed'
+                      (aiCrop && aiAge && aiDisease) && aiStatus !== 'analyzing' ? 'opacity-100 cursor-pointer hover:bg-[#e6a400]' : 'opacity-50 cursor-not-allowed'
                     }`}
-                    disabled={!(aiCrop && aiAge && aiDisease)}
+                    disabled={!(aiCrop && aiAge && aiDisease) || aiStatus === 'analyzing'}
                     onClick={() => {
                       setAiStatus('analyzing');
                       setTimeout(() => {
@@ -421,116 +434,86 @@ const HomeScreen = () => {
                       }, 2000);
                     }}
                   >
-                    {t.analyze} <Sparkles size={14} color="#1a1a1a" />
+                    {aiStatus === 'analyzing' ? (
+                      <><div className="w-4 h-4 border-2 border-[#1a1a1a] border-t-transparent rounded-full animate-spin"></div> {t.analyzing}</>
+                    ) : (
+                      <>{t.analyze} <Sparkles size={14} color="#1a1a1a" /></>
+                    )}
                   </button>
                 </div>
-              )}
-
-              {aiStatus === 'analyzing' && (
-                <div className="flex flex-col items-center justify-center py-6 px-4 bg-gray-50 rounded-xl border border-gray-100 mt-2">
-                  <div className="w-6 h-6 border-2 border-[#FEB600] border-t-transparent rounded-full animate-spin mb-2.5"></div>
-                  <p className="text-[12px] font-bold text-gray-900 m-0 text-center">{t.analyzing}</p>
-                  <p className="text-[10px] text-gray-500 m-0 mt-1 text-center font-medium">{t.crossRef}</p>
-                </div>
-              )}
 
 
             </div>
 
-            {/* ⚠️ उर्वरक और उपकरण सुरक्षा */}
-            <div className="glass-panel rounded-xl p-4">
-              <div className="flex items-center justify-between mb-3.5">
-                <div className="flex items-center gap-1.5">
-                  <div className="w-5 h-5 rounded-[6px] bg-red-500 flex items-center justify-center shrink-0">
-                    <AlertTriangle size={13} color="#fff" />
-                  </div>
-                  <span className="text-[13px] font-extrabold text-gray-900 m-0 font-inter">⚠️ उर्वरक और उपकरण सुरक्षा</span>
-                </div>
-                <div className="flex gap-1">
-                  {safetyTips.map((_, i) => (
-                    <button
-                      key={i}
-                      onClick={() => setActiveTip(i)}
-                      className={`h-1.5 rounded-full transition-all duration-300 border-none cursor-pointer p-0 ${i === activeTip ? 'bg-[#00693B] w-4' : 'bg-gray-300 w-1.5'}`}
-                    />
-                  ))}
-                </div>
-              </div>
 
-              <div className="flex items-start gap-2.5 p-2.5 bg-white/50 backdrop-blur-md rounded-xl border border-gray-200/50 shadow-sm">
-                <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${
-                  activeTip === 0 ? 'bg-blue-100 text-blue-600' :
-                  activeTip === 1 ? 'bg-red-100 text-red-600' :
-                  activeTip === 2 ? 'bg-green-100 text-green-600' : 'bg-purple-100 text-purple-600'
-                }`}>
-                  {safetyTips[activeTip].icon}
+
+            {/* History Section */}
+            <div className="glass-panel rounded-xl p-4 flex flex-col min-h-[200px] flex-1">
+              <div className="flex items-center gap-1.5 mb-3">
+                <Clock size={14} className="text-gray-500" />
+                <h3 className="text-[13px] font-extrabold text-gray-900 m-0 font-inter">Chat History</h3>
+              </div>
+              <div className="flex flex-col gap-2 overflow-y-auto custom-scrollbar flex-1 pr-1">
+                <div className="p-3 bg-white/60 border border-gray-100 rounded-lg cursor-pointer hover:border-[#00693B]/30 transition-colors">
+                  <p className="text-[11px] font-bold text-gray-900 m-0 mb-1">Wheat • Yellowing</p>
+                  <p className="text-[10px] text-gray-500 m-0 truncate">Recommended: Urea application...</p>
                 </div>
-                <p className="text-[12px] font-semibold text-gray-700 m-0 leading-snug flex-1 pt-0.5 font-outfit">{safetyTips[activeTip].tip}</p>
+                <div className="p-3 bg-white/60 border border-gray-100 rounded-lg cursor-pointer hover:border-[#00693B]/30 transition-colors">
+                  <p className="text-[11px] font-bold text-gray-900 m-0 mb-1">Cotton • Whitefly</p>
+                  <p className="text-[10px] text-gray-500 m-0 truncate">Recommended: Imidacloprid spray...</p>
+                </div>
+                <div className="p-3 bg-white/60 border border-gray-100 rounded-lg cursor-pointer hover:border-[#00693B]/30 transition-colors">
+                  <p className="text-[11px] font-bold text-gray-900 m-0 mb-1">Tomato • Leaf Blight</p>
+                  <p className="text-[10px] text-gray-500 m-0 truncate">Recommended: Copper fungicide...</p>
+                </div>
               </div>
             </div>
 
-            {/* स्प्रे और उर्वरक अनुसूची — Spray & Fertilizer Schedule */}
-            <div className="bg-white/70 backdrop-blur-md rounded-xl p-4 border border-[#00693B]/10">
-              <p className="text-[13px] font-extrabold text-gray-900 m-0 mb-3 font-inter">📅 स्प्रे और उर्वरक अनुसूची</p>
-              <div className="flex flex-col gap-2">
-                {[
-                  { emoji: '⏱️', text: 'सुबह 7 से 10 बजे के बीच स्प्रे करना सबसे अच्छा है।' },
-                  { emoji: '💨', text: 'तेज़ हवा में कीटनाशक स्प्रे करने से बचें।' },
-                  { emoji: '🌱', text: 'उर्वरक मिट्टी में नमी होने पर ही डालें।' },
-                ].map((item, i) => (
-                  <div key={i} className="flex items-start gap-2 p-2 bg-white/50 backdrop-blur-sm rounded-lg border border-gray-100/50 shadow-sm">
-                    <span className="text-[14px]">{item.emoji}</span>
-                    <p className="text-[11px] font-semibold text-gray-700 m-0 leading-[1.3] flex-1 pt-0.5 font-outfit">{item.text}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
             </div>
             
-            {/* RIGHT COLUMN: AI Answer Results */}
-            <div className="flex-1 flex flex-col gap-5">
-              {aiStatus === 'idle' && (
-                <div className="flex-1 min-h-[400px] border-2 border-dashed border-[#00693B]/20 rounded-3xl flex flex-col items-center justify-center p-8 text-center bg-white/30 backdrop-blur-sm">
-                  <div className="w-16 h-16 bg-[#F5F7E9] rounded-2xl flex items-center justify-center mb-4">
-                    <Sparkles size={32} color="#00693B" />
+            {/* RIGHT COLUMN: AI Chat Interface */}
+            <div className="flex-1 bg-white rounded-3xl border border-gray-100 shadow-sm flex flex-col overflow-hidden h-full">
+              {/* Header */}
+              <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-[#F5F7E9]">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-[#00693B] rounded-xl flex items-center justify-center">
+                    <Sparkles size={20} className="text-white" />
                   </div>
-                  <h3 className="text-lg font-black text-gray-900 mb-2">Ready to Assist</h3>
-                  <p className="text-sm text-gray-500 font-medium max-w-sm">Select your crop, stage, and issue on the left, then click analyze to get precision farming recommendations.</p>
-                </div>
-              )}
-
-              {aiStatus === 'analyzing' && (
-                <div className="flex-1 min-h-[400px] border border-gray-100 rounded-3xl flex flex-col items-center justify-center p-8 text-center bg-white shadow-sm">
-                  <div className="w-16 h-16 bg-[#FEB600]/10 rounded-2xl flex items-center justify-center mb-4">
-                    <div className="w-8 h-8 border-4 border-[#FEB600] border-t-transparent rounded-full animate-spin"></div>
+                  <div>
+                    <h2 className="font-bold text-base text-gray-900 m-0 leading-tight">Precision Farming AI</h2>
+                    <p className="text-xs font-semibold text-[#00693B] m-0">Live Assistant</p>
                   </div>
-                  <h3 className="text-lg font-black text-gray-900 mb-2">{t.analyzing}</h3>
-                  <p className="text-sm text-gray-500 font-medium">{t.crossRef}</p>
                 </div>
-              )}
+              </div>
 
-              {aiStatus === 'answered' && (
-                <div className="flex-1 bg-white rounded-3xl border border-gray-100 shadow-sm flex flex-col overflow-hidden">
-                  <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-[#F5F7E9]">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-[#00693B] rounded-xl flex items-center justify-center">
-                        <Sparkles size={20} className="text-white" />
-                      </div>
-                      <div>
-                        <h2 className="font-bold text-base text-gray-900 m-0 leading-tight">Diagnosis Complete</h2>
-                        <p className="text-xs font-semibold text-[#00693B] m-0">Precision Farming AI</p>
-                      </div>
+              {/* Chat Body */}
+              <div className="flex-1 p-6 flex flex-col gap-6 overflow-y-auto bg-gray-50/50">
+                {aiStatus === 'idle' && chatMessages.length === 0 && (
+                  <div className="flex-1 flex flex-col items-center justify-center text-center opacity-80 h-full min-h-[300px]">
+                    <h3 className="text-sm font-black text-[#00693B] mb-2">Ask about the crop</h3>
+                    <p className="text-sm text-gray-500 font-medium max-w-sm">Type any question about your crop</p>
+                  </div>
+                )}
+
+                {aiStatus === 'analyzing' && (
+                  <div className="flex-1 flex flex-col items-center justify-center text-center min-h-[300px]">
+                    <div className="w-16 h-16 bg-[#FEB600]/10 rounded-2xl flex items-center justify-center mb-4">
+                      <div className="w-8 h-8 border-4 border-[#FEB600] border-t-transparent rounded-full animate-spin"></div>
                     </div>
+                    <h3 className="text-lg font-black text-gray-900 mb-2">{t.analyzing}</h3>
+                    <p className="text-sm text-gray-500 font-medium">{t.crossRef}</p>
                   </div>
-                  
-                  <div className="p-6 flex flex-col gap-6 overflow-y-auto">
+                )}
+
+                {aiStatus === 'answered' && (
+                  <div className="flex flex-col gap-6">
                     {/* User Query summary */}
                     <div className="self-end max-w-[85%] bg-[#00693B] text-white p-4 rounded-2xl rounded-tr-sm shadow-sm">
                       <p className="text-sm font-medium leading-relaxed m-0">I have a problem with my <strong>{aiCrop}</strong>. It's in the <strong>{aiAge}</strong> stage, and I've noticed <strong>{aiDisease}</strong>.</p>
                     </div>
                     
                     {/* AI Answer */}
-                    <div className="self-start max-w-[90%] bg-gray-50 text-gray-800 p-5 rounded-2xl rounded-tl-sm border border-gray-100 shadow-sm">
+                    <div className="self-start max-w-[90%] bg-white text-gray-800 p-5 rounded-2xl rounded-tl-sm border border-gray-100 shadow-sm">
                       <p className="text-sm leading-relaxed m-0 mb-4 font-medium text-gray-600">
                         Based on your description of <strong className="text-gray-900">{aiDisease}</strong> in <strong className="text-gray-900">{aiCrop}</strong> during the <strong className="text-gray-900">{aiAge}</strong> stage, here is your precision action plan:
                       </p>
@@ -547,11 +530,70 @@ const HomeScreen = () => {
                             Apply a systemic pesticide suitable for {aiDisease}. Ensure you spray early morning or late evening.
                           </p>
                         </div>
+
+                        {/* AI Suggested Products */}
+                        <div className="mt-2 border-t border-gray-100 pt-3">
+                          <h4 className="text-xs font-black text-gray-900 m-0 mb-2 flex items-center gap-1"><ShoppingCart size={14} className="text-amber-500" /> AI Suggested Products</h4>
+                          <div className="flex flex-col gap-2">
+                            <div className="flex items-center gap-3 p-2.5 bg-white border border-gray-200 rounded-lg hover:border-[#00693B] cursor-pointer shadow-sm transition-colors">
+                              <div className="w-10 h-10 bg-gray-50 rounded flex items-center justify-center shrink-0">
+                                <Leaf size={18} className="text-[#00693B]" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-[13px] font-bold text-gray-900 m-0 truncate">Nativo 75 WG Fungicide</p>
+                                <p className="text-[10px] text-gray-500 font-medium m-0">Recommended for {aiDisease || 'disease control'}</p>
+                              </div>
+                              <div className="shrink-0 bg-[#00693B] text-white text-[11px] font-bold px-2 py-1 rounded">₹1,250</div>
+                            </div>
+                            
+                            <div className="flex items-center gap-3 p-2.5 bg-white border border-gray-200 rounded-lg hover:border-[#00693B] cursor-pointer shadow-sm transition-colors">
+                              <div className="w-10 h-10 bg-gray-50 rounded flex items-center justify-center shrink-0">
+                                <Bug size={18} className="text-[#00693B]" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-[13px] font-bold text-gray-900 m-0 truncate">Coragen Insecticide</p>
+                                <p className="text-[10px] text-gray-500 font-medium m-0">Effective pest management</p>
+                              </div>
+                              <div className="shrink-0 bg-[#00693B] text-white text-[11px] font-bold px-2 py-1 rounded">₹1,850</div>
+                            </div>
+                          </div>
+                        </div>
+
                       </div>
                     </div>
                   </div>
-                </div>
-              )}
+                )}
+
+                {/* Chat Messages */}
+                {chatMessages.map((msg, idx) => (
+                  <div key={idx} className={msg.role === 'user' ? "self-end max-w-[85%] bg-[#00693B] text-white p-4 rounded-2xl rounded-tr-sm shadow-sm" : "self-start max-w-[90%] bg-white text-gray-800 p-5 rounded-2xl rounded-tl-sm border border-gray-100 shadow-sm"}>
+                    <p className={`text-sm leading-relaxed m-0 font-medium ${msg.role === 'user' ? '' : 'text-gray-600'}`}>{msg.text}</p>
+                  </div>
+                ))}
+                
+                {isTyping && (
+                  <div className="self-start max-w-[90%] bg-white p-4 rounded-2xl rounded-tl-sm border border-gray-100 shadow-sm flex items-center gap-1.5">
+                    <div className="w-2 h-2 bg-gray-300 rounded-full animate-bounce"></div>
+                    <div className="w-2 h-2 bg-gray-300 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                    <div className="w-2 h-2 bg-gray-300 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                  </div>
+                )}
+              </div>
+
+              {/* Chat Input Area */}
+              <div className="p-4 bg-white border-t border-gray-100 flex items-center gap-3 shrink-0">
+                <input 
+                  type="text" 
+                  value={chatInput}
+                  onChange={e => setChatInput(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && handleSendMessage()}
+                  placeholder="Ask a follow-up question or describe an issue..." 
+                  className="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:border-[#00693B] focus:bg-white transition-colors placeholder:text-gray-400"
+                />
+                <button onClick={handleSendMessage} disabled={isTyping || !chatInput.trim()} className="w-12 h-12 bg-[#00693B] rounded-xl flex items-center justify-center shrink-0 hover:bg-[#004d2b] disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-md transition-all cursor-pointer">
+                  <Send size={18} className="text-white ml-[2px]" />
+                </button>
+              </div>
             </div>
 
           </div>

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Plus, Minus, CreditCard, Package, ArrowLeft } from 'lucide-react';
+import logo from '../assets/logo.png';
 
 const SaleNowScreen = () => {
   const navigate = useNavigate();
@@ -8,7 +9,7 @@ const SaleNowScreen = () => {
 
   if (isDemo) {
     return (
-      <div className="min-h-screen font-outfit flex overflow-hidden bg-gray-50 flex-col items-center justify-center p-8 text-center animate-fade-in-up">
+      <div className="min-h-screen font-outfit flex overflow-hidden bg-transparent flex-col items-center justify-center p-8 text-center animate-fade-in-up">
         <div className="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mb-6">
           <span className="text-4xl">🔒</span>
         </div>
@@ -120,7 +121,7 @@ const SaleNowScreen = () => {
   };
 
   return (
-    <div className="h-screen flex flex-col bg-white font-outfit overflow-hidden">
+    <div className="h-screen flex flex-col bg-transparent font-outfit overflow-hidden">
       <header className="px-6 py-4 flex items-center justify-between border-b border-gray-200 shrink-0">
         <div className="flex items-center gap-3">
           <button
@@ -130,7 +131,7 @@ const SaleNowScreen = () => {
             <ArrowLeft size={18} />
           </button>
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 bg-[#00693B] rounded-xl flex items-center justify-center text-white font-black text-sm font-inter">PI</div>
+            <img src={logo} alt="PI Logo" className="w-10 h-10 object-contain" />
             <div>
               <h1 className="text-base font-black text-[#111827] m-0 leading-tight font-inter">Sale Now</h1>
               <p className="text-[10px] font-semibold text-gray-400 m-0 uppercase tracking-widest">POS Checkout</p>

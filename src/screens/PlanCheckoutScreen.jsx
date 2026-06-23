@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { ArrowLeft, CheckCircle2, ShieldCheck, CreditCard } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, ShieldCheck, CreditCard, Lock } from 'lucide-react';
 
 const PlanCheckoutScreen = () => {
   const location = useLocation();
@@ -8,7 +8,7 @@ const PlanCheckoutScreen = () => {
   const [isProcessing, setIsProcessing] = useState(false);
 
   // Fallback if accessed directly
-  const planData = location.state || { plan: 'Quarterly Plan', price: 99, duration: '3 months' };
+  const planData = location.state || { plan: 'Annual Pro', price: 99, duration: '1 year' };
 
   const handlePayment = () => {
     setIsProcessing(true);
@@ -19,7 +19,7 @@ const PlanCheckoutScreen = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 font-outfit py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-transparent font-outfit py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-xl mx-auto">
         <button 
           onClick={() => navigate(-1)}

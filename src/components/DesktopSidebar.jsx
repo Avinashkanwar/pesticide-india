@@ -1,6 +1,7 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, Bot, Scale, Store, PackageSearch, ShoppingCart, Package } from 'lucide-react';
+import logo from '../assets/logo.png';
 
 const DesktopSidebar = () => {
   const navigate = useNavigate();
@@ -20,9 +21,9 @@ const DesktopSidebar = () => {
       {/* Logo Mark */}
       <div 
         onClick={() => navigate('/')}
-        className="flex items-center justify-center cursor-pointer w-12 h-12 rounded-xl bg-[#00693B] text-white font-bold text-xl shadow-lg shadow-[#00693B]/20 mb-6 hover:scale-105 transition-transform"
+        className="flex items-center justify-center cursor-pointer w-14 h-14 mb-6 hover:scale-105 transition-transform"
       >
-        PI
+        <img src={logo} alt="PI Logo" className="w-full h-full object-contain" />
       </div>
 
       {/* Navigation Icons */}

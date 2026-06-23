@@ -107,7 +107,7 @@ const PaymentScreen = () => {
   ];
 
   return (
-    <div className="min-h-screen font-outfit bg-gray-50/50">
+    <div className="min-h-screen font-outfit bg-transparent">
       <header className="px-5 py-4 flex items-center justify-between gap-4 sticky top-0 z-50 bg-white border-b border-gray-100">
         <div className="flex items-center gap-3">
           <button
