@@ -1,5 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import apiClient from '../api/apiClient';
+import { ENDPOINTS } from '../api/endpoints';
 import DesktopSidebar from '../components/DesktopSidebar';
 import MobileBottomNav from '../components/MobileBottomNav';
 import { 
@@ -19,7 +21,8 @@ import {
   ChevronRight,
   ShoppingCart,
   Store,
-  Clock
+  Clock,
+  X
 } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
 import { getCartCount } from '../utils/cartHelper';
@@ -185,21 +188,70 @@ const HomeScreen = () => {
   const [aiAge, setAiAge] = useState('');
   const [aiDisease, setAiDisease] = useState('');
   const [aiStatus, setAiStatus] = useState('idle');
+  const [aiAnalysisResult, setAiAnalysisResult] = useState('');
   const [chatInput, setChatInput] = useState('');
   const [chatMessages, setChatMessages] = useState([]);
   const [isTyping, setIsTyping] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const fileInputRef = useRef(null);
 
-  const handleSendMessage = () => {
-    if (!chatInput.trim()) return;
-    setChatMessages(prev => [...prev, { role: 'user', text: chatInput }]);
+  const handleImageSelect = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setSelectedFile(file);
+    }
+    e.target.value = null; // Reset input so same file can be selected again
+  };
+
+  const handleSendMessage = async () => {
+    if (!chatInput.trim() && !selectedFile) return;
+    
+    const currentInput = chatInput;
+    const fileToSend = selectedFile;
+    
+    // Optimistic UI Update
+    if (fileToSend) {
+      setChatMessages(prev => [...prev, { role: 'user', text: `[Image Attached: ${fileToSend.name}]\n${currentInput}` }]);
+    } else {
+      setChatMessages(prev => [...prev, { role: 'user', text: currentInput }]);
+    }
+    
     setChatInput('');
+    setSelectedFile(null);
     setIsTyping(true);
     if (aiStatus === 'idle') setAiStatus('chatting');
+
+    try {
+      if (fileToSend) {
+        const formData = new FormData();
+        formData.append('file', fileToSend);
+        
+        const res = await apiClient.post(ENDPOINTS.ANALYZE_IMAGE, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        
+        if (res.data && res.data.analysis) {
+          setIsTyping(false);
+          setChatMessages(prev => [...prev, { role: 'ai', text: res.data.analysis }]);
+          return;
+        }
+      } else {
+        const res = await apiClient.post(ENDPOINTS.AI_CHAT, { message: currentInput });
+        if (res.data && res.data.reply) {
+          setIsTyping(false);
+          setChatMessages(prev => [...prev, { role: 'ai', text: res.data.reply }]);
+          return;
+        }
+      }
+    } catch (error) {
+      console.error('API failed, falling back', error);
+    }
+
     setTimeout(() => {
       setIsTyping(false);
       setChatMessages(prev => [...prev, {
         role: 'ai',
-        text: 'I understand. Please ensure you monitor the soil moisture regularly. Applying a light dose of water-soluble NPK can help boost recovery. Let me know if you see any further symptoms!'
+        text: 'Sorry, I could not process your request at this moment.'
       }]);
     }, 1500);
   };
@@ -427,8 +479,20 @@ const HomeScreen = () => {
                       (aiCrop && aiAge && aiDisease) && aiStatus !== 'analyzing' ? 'opacity-100 cursor-pointer hover:bg-[#e6a400]' : 'opacity-50 cursor-not-allowed'
                     }`}
                     disabled={!(aiCrop && aiAge && aiDisease) || aiStatus === 'analyzing'}
-                    onClick={() => {
+                    onClick={async () => {
                       setAiStatus('analyzing');
+                      try {
+                        const res = await apiClient.post(ENDPOINTS.CROP_ANALYSIS, {
+                          crop: aiCrop, stage: aiAge, issue: aiDisease
+                        });
+                        if (res.data && res.data.analysis) {
+                          setAiAnalysisResult(res.data.analysis);
+                          setAiStatus('answered');
+                          return;
+                        }
+                      } catch (err) {
+                        console.error('Crop Analysis API failed, falling back', err);
+                      }
                       setTimeout(() => {
                         setAiStatus('answered');
                       }, 2000);
@@ -519,17 +583,27 @@ const HomeScreen = () => {
                       </p>
                       
                       <div className="flex flex-col gap-3">
-                        <div className="p-3 bg-red-50 border border-red-100 rounded-xl">
-                          <h4 className="text-xs font-black text-red-700 m-0 mb-1 flex items-center gap-1"><AlertTriangle size={14}/> Immediate Action</h4>
-                          <p className="text-xs text-red-600 m-0 font-medium">Isolate affected areas if possible. Do not over-water the plants.</p>
-                        </div>
-                        
-                        <div className="p-3 bg-[#F5F7E9] border border-[#00693B]/20 rounded-xl">
-                          <h4 className="text-xs font-black text-[#00693B] m-0 mb-2 flex items-center gap-1"><Leaf size={14}/> Recommended Treatment</h4>
-                          <p className="text-xs text-gray-700 m-0 font-medium leading-relaxed">
-                            Apply a systemic pesticide suitable for {aiDisease}. Ensure you spray early morning or late evening.
-                          </p>
-                        </div>
+                        {aiAnalysisResult ? (
+                          <div className="p-4 bg-[#F5F7E9] border border-[#00693B]/20 rounded-xl">
+                            <p className="text-xs text-gray-700 m-0 font-medium whitespace-pre-wrap leading-relaxed">
+                              {aiAnalysisResult}
+                            </p>
+                          </div>
+                        ) : (
+                          <>
+                            <div className="p-3 bg-red-50 border border-red-100 rounded-xl">
+                              <h4 className="text-xs font-black text-red-700 m-0 mb-1 flex items-center gap-1"><AlertTriangle size={14}/> Immediate Action</h4>
+                              <p className="text-xs text-red-600 m-0 font-medium">Isolate affected areas if possible. Do not over-water the plants.</p>
+                            </div>
+                            
+                            <div className="p-3 bg-[#F5F7E9] border border-[#00693B]/20 rounded-xl">
+                              <h4 className="text-xs font-black text-[#00693B] m-0 mb-2 flex items-center gap-1"><Leaf size={14}/> Recommended Treatment</h4>
+                              <p className="text-xs text-gray-700 m-0 font-medium leading-relaxed">
+                                Apply a systemic pesticide suitable for {aiDisease}. Ensure you spray early morning or late evening.
+                              </p>
+                            </div>
+                          </>
+                        )}
 
                         {/* AI Suggested Products */}
                         <div className="mt-2 border-t border-gray-100 pt-3">
@@ -564,10 +638,9 @@ const HomeScreen = () => {
                   </div>
                 )}
 
-                {/* Chat Messages */}
                 {chatMessages.map((msg, idx) => (
                   <div key={idx} className={msg.role === 'user' ? "self-end max-w-[85%] bg-[#00693B] text-white p-4 rounded-2xl rounded-tr-sm shadow-sm" : "self-start max-w-[90%] bg-white text-gray-800 p-5 rounded-2xl rounded-tl-sm border border-gray-100 shadow-sm"}>
-                    <p className={`text-sm leading-relaxed m-0 font-medium ${msg.role === 'user' ? '' : 'text-gray-600'}`}>{msg.text}</p>
+                    <p className={`text-sm leading-relaxed m-0 font-medium whitespace-pre-wrap ${msg.role === 'user' ? '' : 'text-gray-600'}`}>{msg.text}</p>
                   </div>
                 ))}
                 
@@ -581,18 +654,35 @@ const HomeScreen = () => {
               </div>
 
               {/* Chat Input Area */}
-              <div className="p-4 bg-white border-t border-gray-100 flex items-center gap-3 shrink-0">
-                <input 
-                  type="text" 
-                  value={chatInput}
-                  onChange={e => setChatInput(e.target.value)}
-                  onKeyDown={e => e.key === 'Enter' && handleSendMessage()}
-                  placeholder="Ask a follow-up question or describe an issue..." 
-                  className="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:border-[#00693B] focus:bg-white transition-colors placeholder:text-gray-400"
-                />
-                <button onClick={handleSendMessage} disabled={isTyping || !chatInput.trim()} className="w-12 h-12 bg-[#00693B] rounded-xl flex items-center justify-center shrink-0 hover:bg-[#004d2b] disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-md transition-all cursor-pointer">
-                  <Send size={18} className="text-white ml-[2px]" />
-                </button>
+              <div className="p-4 bg-white border-t border-gray-100 flex flex-col gap-3 shrink-0">
+                {selectedFile && (
+                  <div className="flex items-center justify-between bg-blue-50 border border-blue-100 px-3 py-2 rounded-lg max-w-sm self-start">
+                    <div className="flex items-center gap-2">
+                      <Camera size={14} className="text-blue-600" />
+                      <span className="text-xs font-medium text-blue-800 truncate max-w-[200px]">{selectedFile.name}</span>
+                    </div>
+                    <button onClick={() => setSelectedFile(null)} className="text-blue-400 hover:text-blue-600 cursor-pointer ml-4">
+                      <X size={14} />
+                    </button>
+                  </div>
+                )}
+                <div className="flex items-center gap-3 w-full">
+                  <input type="file" accept="image/*" className="hidden" ref={fileInputRef} onChange={handleImageSelect} />
+                  <button onClick={() => fileInputRef.current?.click()} disabled={isTyping} className="w-12 h-12 bg-gray-100 text-gray-500 rounded-xl flex items-center justify-center shrink-0 hover:bg-gray-200 hover:text-[#00693B] transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
+                    <Camera size={20} />
+                  </button>
+                  <input 
+                    type="text" 
+                    value={chatInput}
+                    onChange={e => setChatInput(e.target.value)}
+                    onKeyDown={e => e.key === 'Enter' && handleSendMessage()}
+                    placeholder="Ask a follow-up question or describe an issue..." 
+                    className="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:border-[#00693B] focus:bg-white transition-colors placeholder:text-gray-400"
+                  />
+                  <button onClick={handleSendMessage} disabled={isTyping || (!chatInput.trim() && !selectedFile)} className="w-12 h-12 bg-[#00693B] rounded-xl flex items-center justify-center shrink-0 hover:bg-[#004d2b] disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-md transition-all cursor-pointer">
+                    <Send size={18} className="text-white ml-[2px]" />
+                  </button>
+                </div>
               </div>
             </div>
 

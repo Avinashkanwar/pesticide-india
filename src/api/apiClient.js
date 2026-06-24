@@ -15,7 +15,7 @@ apiClient.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Token ${token}`; // or `Bearer ${token}` based on your backend
     }
-    return config;
+    return config
   },
   (error) => {
     return Promise.reject(error);

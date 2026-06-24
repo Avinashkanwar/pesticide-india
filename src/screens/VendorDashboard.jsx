@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import apiClient from '../api/apiClient';
+import { ENDPOINTS } from '../api/endpoints';
 import DesktopSidebar from '../components/DesktopSidebar';
 import MobileBottomNav from '../components/MobileBottomNav';
 import Header from '../components/Header';
@@ -114,6 +116,29 @@ const VendorDashboard = () => {
       return mockSales;
     } catch { return []; }
   });
+
+  const [apiDashboardStats, setApiDashboardStats] = useState(null);
+  const [apiDebtors, setApiDebtors] = useState(null);
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        const [dashboardRes, debtorsRes] = await Promise.all([
+          apiClient.get(ENDPOINTS.DASHBOARD),
+          apiClient.get(ENDPOINTS.DEBTORS)
+        ]);
+        if (dashboardRes.data && dashboardRes.data.total_products !== undefined) {
+          setApiDashboardStats(dashboardRes.data);
+        }
+        if (debtorsRes.data && Array.isArray(debtorsRes.data)) {
+          setApiDebtors(debtorsRes.data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch dashboard API, falling back to dummy data', error);
+      }
+    };
+    fetchDashboardData();
+  }, []);
 
   // ── Product Management ───────────────────────────
   const saveProducts = (updated) => {
@@ -266,9 +291,9 @@ const VendorDashboard = () => {
           {/* CLEAN DASHBOARD STATS (Smaller Size) */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
             {[
-              { label: 'Monthly Revenue', value: '₹ ' + (sales.reduce((sum, s) => sum + s.amount, 0)/1000).toFixed(1) + 'k', sub: 'Calculated from sales', icon: <TrendingUp size={16} />, color: 'text-emerald-600 bg-emerald-50 border-emerald-200' },
-              { label: 'Total Debtors', value: customers.filter(c => c.udhaarBalance > 0).length, sub: 'Active accounts', icon: <User size={16} />, color: 'text-blue-600 bg-blue-50 border-blue-200' },
-              { label: 'Total Products', value: 10 + products.length, sub: `${10 + inStockCount} in stock`, icon: <Package size={16} />, color: 'text-[#00693B] bg-[#F5F7E9] border-[#00693B]/30' },
+              { label: 'Monthly Revenue', value: '₹ ' + (apiDashboardStats ? (apiDashboardStats.monthly_earnings/1000).toFixed(1) : (sales.reduce((sum, s) => sum + s.amount, 0)/1000).toFixed(1)) + 'k', sub: apiDashboardStats ? 'API Data' : 'Calculated from sales', icon: <TrendingUp size={16} />, color: 'text-emerald-600 bg-emerald-50 border-emerald-200' },
+              { label: 'Total Debtors', value: apiDebtors ? apiDebtors.length : customers.filter(c => c.udhaarBalance > 0).length, sub: 'Active accounts', icon: <User size={16} />, color: 'text-blue-600 bg-blue-50 border-blue-200' },
+              { label: 'Total Products', value: apiDashboardStats ? apiDashboardStats.total_products : (10 + products.length), sub: apiDashboardStats ? 'From API' : `${10 + inStockCount} in stock`, icon: <Package size={16} />, color: 'text-[#00693B] bg-[#F5F7E9] border-[#00693B]/30' },
             ].map((s, i) => (
               <div key={i} className="bg-white border border-gray-200/80 rounded-xl p-3 flex flex-col gap-1.5 relative overflow-hidden group hover:border-[#00693B]/40 hover:shadow-sm transition-all cursor-default">
                 <div className={`w-8 h-8 rounded-lg flex items-center justify-center border ${s.color} mb-0.5 shadow-sm`}>{s.icon}</div>
@@ -396,7 +421,7 @@ const VendorDashboard = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {customers.filter(c => c.udhaarBalance > 0).map((debtor, idx) => (
+                    {(apiDebtors ? apiDebtors.map(d => ({ name: d.customer?.name || 'Unknown', phone: d.customer?.mobile || 'N/A', udhaarBalance: d.due_amount, dueDate: d.created_at })) : customers.filter(c => c.udhaarBalance > 0)).map((debtor, idx) => (
                       <tr key={idx} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors">
                         <td className="py-3 text-xs font-bold text-gray-900 whitespace-nowrap">{debtor.name}</td>
                         <td className="py-3 text-xs font-semibold text-gray-600 whitespace-nowrap">{debtor.phone}</td>
